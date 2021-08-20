@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CompraMI</title>
+    <link rel="icon" href="templates/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="templates/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="CSS/styles.css">
+    <script src="JS/login.js" charset="utf-8" defer></script>
+    <script src="JS/utils.js" charset="utf-8" defer></script>
+</head>
+
+<body>
+<header>
+</header>
+<h1 class="titleIndex">Benvenut* sul nostro sito di compravendita</h1>
+
+<div class="login_body">
+    <div class="column">
+        <h2 style="text-align: center">Accesso per i clienti</h2>
+        <form class="formLogin" action="#">
+            <label for="emailCustomer">
+                Username
+                <input type="text" maxlength="45" required id="emailCustomer" name="emailCustomer">
+            </label><br><br>
+            <label for="passwordCustomer">
+                Password
+                <input type="password" maxlength="45" id="passwordCustomer" required name="passwordCustomer">
+            </label><br><br>
+            <input type="submit" value="Accedi" id="loginButton">
+            <p class="error" id="errormessage"></p>
+        </form>
+    </div>
+</div>
+
+<footer></footer>
+
+</body>
+</html>
