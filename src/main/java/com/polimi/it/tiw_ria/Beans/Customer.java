@@ -15,9 +15,9 @@ public class Customer implements Serializable {
     public Customer(String name, String surname, String email, String address, String password, String sex) {
         this.name = name;
         this.surname = surname;
-        this. email = email;
+        this.email = email;
         this.address = address;
-        this. sex = sex;
+        this.sex = sex;
         this.password = password;
     }
 

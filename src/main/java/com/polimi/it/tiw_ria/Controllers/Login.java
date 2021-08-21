@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import com.google.gson.Gson;
+
 @WebServlet(name = "Login", value = "/Login")
 @MultipartConfig
 public class Login extends HttpServlet {
@@ -63,13 +65,16 @@ public class Login extends HttpServlet {
                     session.setAttribute("emailCustomer", email);
                     session.setAttribute("name", customer.getName());
                     session.setAttribute("sex", customer.getSex());
+
+                    String user = new Gson().toJson(customerDAO.getCustomer(email, password));
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
+                    response.getWriter().println(user);
                 }
                 else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().println("Incorrect credentials");
+                    response.getWriter().println("Account inesistente!");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -77,7 +82,7 @@ public class Login extends HttpServlet {
         }
         else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().println("Incorrect credentials");
+            response.getWriter().println("Credenziali non valide!");
         }
     }
 
