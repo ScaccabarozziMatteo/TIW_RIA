@@ -26,8 +26,13 @@
                 break;
         }
     }
+    else
+        window.location.replace("index.html");
 
-    logout_button.addEventListener("click", ev => {sessionStorage.clear()})
+    logout_button.addEventListener("click", ev => {
+        sessionStorage.clear();
+        window.location.replace("index.html");
+    })
 
     var coll = document.getElementsByClassName("collapsible");
     var i;

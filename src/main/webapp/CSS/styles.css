@@ -247,8 +247,12 @@ a:hover {
     background-color: #777;
 }
 
+.active:after {
+    content: "\2212";
+}
+
 .collapsible:after {
-    content: '\002B';
+    content: '\002B73';
     color: white;
     font-weight: bold;
     float: right;
