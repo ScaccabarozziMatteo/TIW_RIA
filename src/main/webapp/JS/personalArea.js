@@ -1,17 +1,11 @@
 (function () {
 
-    /*
-    window.addEventListener("load", () => {
-        pageOrchestrator.start();
-        pageOrchestrator.refresh();
-    });
-
-     */
-
     var name = sessionStorage.getItem('username');
     var sex = sessionStorage.getItem('sex');
     const welcomeDiv = document.getElementById("welcome");
     const logout_button = document.getElementById("logoutButton");
+    const searchBar = document.getElementById("searchBar");
+
 
     if (name != null) {
         switch (sex) {
@@ -47,6 +41,35 @@
                 content.style.maxHeight = content.scrollHeight + "px";
             }
         });
+    }
+
+    searchBar.addEventListener("load", e => {
+            makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
+                function (request) {
+                    switch (request.status) {
+                        case 200:
+                            var productsSearched = JSON.parse(request.responseText);
+                            printProductSearched(productsSearched)
+                    }
+                })
+    });
+
+    function printProductSearched(listProducts) {
+        const searchedProd = document.getElementById("searchedProducts");
+        var table = document.createElement('table');
+        var tableBody = document.createElement('tbody');
+
+        searchedProd.style.display = "block";
+
+        for (var i = 0; i < listProducts.length; i++) {
+            var row = document.createElement('tr');
+            var nameCol = document.createElement('td');
+            nameCol.textContent = listProducts[i].name;
+            row.appendChild(nameCol);
+            tableBody.appendChild(row);
+        }
+        table.appendChild(tableBody);
+        searchedProd.append(table);
     }
 
 }) ();
