@@ -13,7 +13,7 @@ public class Product implements Serializable {
     private String category;
     private String image;
     private float price;
-    private boolean sale;
+    private boolean sale = true;
 
     public Product(int code, String name, String description, String category, String image) throws IOException {
         this.code = code;

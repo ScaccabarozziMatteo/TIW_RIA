@@ -43,15 +43,21 @@
         });
     }
 
+
     searchBar.addEventListener("keyup", e => {
-            makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
-                function (request) {
-                    switch (request.status) {
-                        case 200:
-                            var productsSearched = JSON.parse(request.responseText);
-                            printProductSearched(productsSearched)
-                    }
-                })
+        if (searchBar.value !== '') {
+            if (e.key !== 'Enter') {
+                makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
+                    function (request) {
+                        switch (request.status) {
+                            case 200:
+                                var productsSearched = JSON.parse(request.responseText);
+                                printProductSearched(productsSearched)
+                        }
+                    })
+            }
+        } else
+            printProductSearched(null);
     });
 
     function printProductSearched(listProducts) {
@@ -59,24 +65,26 @@
         var tableExisted = document.getElementById('tableProductSearched');
         if (tableExisted != null)
             tableExisted.remove();
-        var table = document.createElement('table');
-        table.id = "tableProductSearched";
-        var tableBody = document.createElement('tbody');
+        if (listProducts != null) {
+            var table = document.createElement('table');
+            table.id = "tableProductSearched";
+            var tableBody = document.createElement('tbody');
 
-        searchedProd.style.display = "block";
+            searchedProd.style.display = "block";
 
-        for (var i = 0; i < listProducts.length; i++) {
-            var row = document.createElement('tr');
-            var nameCol = document.createElement('td');
-            var description = document.createElement('td');
-            nameCol.textContent = listProducts[i].name;
-            description.textContent = listProducts[i].description;
-            row.appendChild(nameCol);
-            row.appendChild(description)
-            tableBody.appendChild(row);
+            for (var i = 0; i < listProducts.length; i++) {
+                var row = document.createElement('tr');
+                var nameCol = document.createElement('td');
+                var description = document.createElement('td');
+                nameCol.textContent = listProducts[i].name;
+                description.textContent = listProducts[i].description;
+                row.appendChild(nameCol);
+                row.appendChild(description)
+                tableBody.appendChild(row);
+            }
+            table.appendChild(tableBody);
+            searchedProd.appendChild(table);
         }
-        table.appendChild(tableBody);
-        searchedProd.appendChild(table);
     }
 
 }) ();
