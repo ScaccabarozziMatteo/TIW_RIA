@@ -43,7 +43,7 @@
         });
     }
 
-    searchBar.addEventListener("load", e => {
+    searchBar.addEventListener("keyup", e => {
             makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
                 function (request) {
                     switch (request.status) {
@@ -56,7 +56,11 @@
 
     function printProductSearched(listProducts) {
         const searchedProd = document.getElementById("searchedProducts");
+        var tableExisted = document.getElementById('tableProductSearched');
+        if (tableExisted != null)
+            tableExisted.remove();
         var table = document.createElement('table');
+        table.id = "tableProductSearched";
         var tableBody = document.createElement('tbody');
 
         searchedProd.style.display = "block";
@@ -64,12 +68,15 @@
         for (var i = 0; i < listProducts.length; i++) {
             var row = document.createElement('tr');
             var nameCol = document.createElement('td');
+            var description = document.createElement('td');
             nameCol.textContent = listProducts[i].name;
+            description.textContent = listProducts[i].description;
             row.appendChild(nameCol);
+            row.appendChild(description)
             tableBody.appendChild(row);
         }
         table.appendChild(tableBody);
-        searchedProd.append(table);
+        searchedProd.appendChild(table);
     }
 
 }) ();
