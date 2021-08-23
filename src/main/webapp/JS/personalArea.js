@@ -138,9 +138,14 @@
 
                 codeCol.textContent = listProducts[i].code;
                 nameCol.textContent = listProducts[i].name;
-                priceCol.textContent = listProducts[i].price;
+                priceCol.textContent = listProducts[i].price + ".00 \u20ac";
+                const nameId = "detailButton" + listProducts[i].code;
+                detailsCol.innerHTML = "<button id="+ nameId + ">Dettagli</button>";
+                //productDetails(listProducts[i].code, nameId);
+                row2.appendChild(codeCol);
                 row2.appendChild(nameCol);
-                row2.appendChild(priceCol)
+                row2.appendChild(priceCol);
+                row2.appendChild(detailsCol);
                 tableBody.appendChild(row2);
             }
             table.appendChild(tableBody);
