@@ -171,8 +171,18 @@
         const detailsPopup = document.createElement("div");
         detailsPopup.id = "detailsPopup";
 
+        const close = document.createElement('span');
+        close.id = 'closePopup';
+        close.textContent = "&#10006;";
+        close.style.textAlign = 'right';
+        detailsPopup.appendChild(close);
+
+        close.addEventListener("click", ev =>
+        detailsPopupContainer.style.display = 'none');
+
         var title = document.createElement('h3');
-        title.textContent = product.code + " - " + product.name;
+        title.textContent = product.name;
+        title.style.textAlign = 'center';
         detailsPopup.appendChild(title);
         detailsPopup.appendChild(document.createElement("hr"));
 
@@ -187,6 +197,8 @@
         detailsPopup.appendChild(description);
         detailsPopup.appendChild(photo);
         detailsPopupContainer.appendChild(detailsPopup);
+
+        detailsPopupContainer.style.display = 'block';
 
 
     }
