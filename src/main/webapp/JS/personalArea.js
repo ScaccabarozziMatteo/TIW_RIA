@@ -133,12 +133,12 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId);
+                productDetails(listProducts[i].code, nameId, listProducts[i]);
             }
         }
     }
 
-    function productDetails(codeProd, nameId) {
+    function productDetails(codeProd, nameId, product) {
         const button = document.getElementById(nameId);
 
         button.addEventListener("click",e => {
@@ -148,7 +148,7 @@
                         switch (request.status) {
                             case 200:
                                 var shipmentPolicies = JSON.parse(request.responseText);
-                                printProductDetails (shipmentPolicies,product);
+                                printProductDetails (shipmentPolicies, product);
                         }
                     });
 
@@ -164,8 +164,12 @@
 
 
     function printProductDetails (shipmentPolicies,product) {
+        const detailsPopupContainer = document.getElementById("detailsPopupContainer");
 
-        const detailsPopup = document.getElementById("detailsPopup");
+        if (document.getElementById("detailsPopup") != null)
+            document.getElementById("detailsPopup").remove();
+        const detailsPopup = document.createElement("div");
+        detailsPopup.id = "detailsPopup";
 
         var title = document.createElement('h3');
         title.textContent = product.code + " - " + product.name;
@@ -177,10 +181,12 @@
 
         var photo = document.createElement("img");
         photo.src = "upload/"+product.image;
+        photo.height = 100;
+        photo.alt = "imageProduct";
 
         detailsPopup.appendChild(description);
         detailsPopup.appendChild(photo);
-
+        detailsPopupContainer.appendChild(detailsPopup);
 
 
     }
