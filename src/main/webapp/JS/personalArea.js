@@ -31,15 +31,37 @@ var cart = [];
     })
 
     var coll = document.getElementsByClassName("collapsible");
-    var i;
+    var cartColl = document.getElementById("cartCollapsible");
+    var contentCart = document.getElementById("contentCart");
 
-    for (i = 0; i < coll.length; i++) {
+    for (let i = 0; i < coll.length; i++) {
         coll[i].addEventListener("click", function () {
             this.classList.toggle("active");
             var content = this.nextElementSibling;
             if (content.style.maxHeight) {
                 content.style.maxHeight = null;
+                if (document.getElementById("cartMessage") !== null)
+                    document.getElementById("cartMessage").remove();
             } else {
+                if (cart.length === 0) {
+                    let cartMessage = document.createElement('h3');
+                    cartMessage.id = 'cartMessage';
+                    cartMessage.textContent = 'Carrello vuoto! :(';
+                    contentCart.appendChild(cartMessage);
+                }
+                else {
+                    for (let y = 0; y < cart.length; y++) {
+                        let cartMessage = document.createElement('h3');
+                        cartMessage.textContent = cart[y].supplier.name;
+                        contentCart.appendChild(cartMessage);
+                        for (let a = 0; a < cart[y].products.length; a++) {
+                            let supplierProduct = document.createElement('p');
+                            supplierProduct.textContent = cart[y].products[a].product.name;
+                            contentCart.appendChild(supplierProduct);
+                        }
+                    }
+                }
+
                 content.style.maxHeight = content.scrollHeight + "px";
             }
         });
@@ -76,12 +98,17 @@ var cart = [];
 
     function printProductSearched(listProducts, searchBar) {
         const searchedProd = document.getElementById("searchedProducts");
-        var tableExisted = document.getElementById('tableProductSearched');
+        let tableExisted = document.getElementById('tableProductSearched');
+        let messageExist = document.getElementById('messageSearchProd');
+        if (messageExist != null) {
+            messageExist.remove();
+        }
+
         if (tableExisted != null) {
             tableExisted.remove();
             document.getElementById('titleSearch').remove();
         }
-        if (listProducts != null) {
+        if (listProducts != null && listProducts.length > 0) {
             var title = document.createElement('h3')
             title.id = "titleSearch";
             title.textContent = "Elementi trovati per: " + searchBar.value;
@@ -136,6 +163,11 @@ var cart = [];
                 const nameId = "detailButton" + listProducts[i].code;
                 productDetails(listProducts[i].code, nameId, listProducts[i]);
             }
+        } else if (searchBar.value !== '') {
+            let message = document.createElement('h3');
+            message.id = 'messageSearchProd';
+            message.textContent = "Nessun elemento trovato :("
+            searchedProd.appendChild(message);
         }
     }
 
@@ -291,7 +323,10 @@ var cart = [];
 
             let supplier = suppliers[x];
 
-            addProductsForm.addEventListener('submit', ev => addProductsCart(supplier, product));
+            addProductsForm.addEventListener('submit', ev => {
+                ev.preventDefault();
+                addProductsCart(supplier, product)
+            });
 
 
         }
@@ -307,12 +342,36 @@ var cart = [];
 
     function addProductsCart(supplier, prod) {
         var quantity = document.getElementById('submitQuantity');
-        var products = {};
-        products.supplier = supplier;
+        let cartLength = cart.length;
+        let product = null;
+        var products = {
+            product,
+            quantity
+        };
+        var order = {
+            products: [],
+            supplier
+        };
+
+
+        for (let i = 0; i < cartLength; i++) {
+            if (cart[i].order.supplier.code === supplier.code) {
+                let numProd = cart[i].order.products.length;
+                for (let x = 0; x < numProd; x++) {
+                    if (cart[i].order.products[x].product.code === prod.code) {
+
+                    }
+                }
+                return false;
+            }
+        }
+        order.supplier = supplier;
         products.product = prod;
         products.quantity = quantity;
-        cart.push(products);
-        console.alert(cart[0].supplier.name);
+        order.products.push(products);
+        cart.push(order);
+
+        return false;
     }
 
 }) ();
