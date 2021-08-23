@@ -5,6 +5,7 @@
     const welcomeDiv = document.getElementById("welcome");
     const logout_button = document.getElementById("logoutButton");
     const searchBar = document.getElementById("searchBar");
+    var cart = null;
 
 
     if (name != null) {
@@ -132,13 +133,14 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId,listProducts[i]);
+                productDetails(listProducts[i].code, nameId);
             }
         }
     }
 
-    function productDetails(codeProd, nameId, product) {
+    function productDetails(codeProd, nameId) {
         const button = document.getElementById(nameId);
+
         button.addEventListener("click",e => {
 
                 makeCall("GET" , 'getInfoShipmentProduct?code=' + codeProd ,null,
