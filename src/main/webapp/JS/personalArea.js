@@ -45,6 +45,15 @@
 
 
     searchBar.addEventListener("keyup", e => {
+
+        var el = document.getElementById("searchBar");
+        el.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+            }
+        });
+
+
         if (searchBar.value !== '') {
             if (e.key !== 'Enter') {
                 makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
@@ -56,8 +65,10 @@
                         }
                     })
             }
-        } else
-            printProductSearched(null);
+        }  else
+                printProductSearched(null);
+
+
     });
 
     function printProductSearched(listProducts) {
