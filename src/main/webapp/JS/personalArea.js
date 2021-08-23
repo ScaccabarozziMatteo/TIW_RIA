@@ -173,8 +173,9 @@
 
         const close = document.createElement('span');
         close.id = 'closePopup';
-        close.textContent = "&#10006;";
-        close.style.textAlign = 'right';
+        close.textContent = "✖";
+        close.style.float = 'right';
+        close.style.fontSize = '30px';
         detailsPopup.appendChild(close);
 
         close.addEventListener("click", ev =>
@@ -186,16 +187,27 @@
         detailsPopup.appendChild(title);
         detailsPopup.appendChild(document.createElement("hr"));
 
+        var code = document.createElement("p");
+        code.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Codice prodotto: </span>' + product.code;
+
         var description = document.createElement("p");
-        description.textContent = product.description;
+        description.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Descrizione:</span><br>' + product.description;
+
+        var category = document.createElement("p");
+        category.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Categoria prodotto: </span>' + product.category;
 
         var photo = document.createElement("img");
         photo.src = "upload/"+product.image;
         photo.height = 100;
         photo.alt = "imageProduct";
+        photo.id = 'imgPopup';
 
-        detailsPopup.appendChild(description);
         detailsPopup.appendChild(photo);
+        detailsPopup.appendChild(code);
+        detailsPopup.appendChild(document.createElement('br'));
+        detailsPopup.appendChild(description);
+        detailsPopup.appendChild(document.createElement('br'));
+        detailsPopup.appendChild(category);
         detailsPopupContainer.appendChild(detailsPopup);
 
         detailsPopupContainer.style.display = 'block';
