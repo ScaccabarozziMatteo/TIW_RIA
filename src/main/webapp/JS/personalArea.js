@@ -71,27 +71,6 @@
 
     });
 
-    function productDetails(codeProd,nameId) {
-        var button = document.getElementById("detailButton");
-
-        button.addEventListener("click",e => {
-                makeCall("GET" , 'getInfoProduct?code='+codeProd ,null );
-                var product = document.getElementById(codeProd);
-                var close = document.getElementsByClassName("close")[0];
-                button.onclick = function() {
-                    product.style.display = "block";
-                }
-                close.onclick = function() {
-                    product.style.display = "none";
-                }
-
-            }
-
-
-        )
-
-    }
-
 
     function printProductSearched(listProducts, searchBar) {
         const searchedProd = document.getElementById("searchedProducts");
@@ -140,8 +119,7 @@
                 nameCol.textContent = listProducts[i].name;
                 priceCol.textContent = listProducts[i].price + ".00 \u20ac";
                 const nameId = "detailButton" + listProducts[i].code;
-                detailsCol.innerHTML = "<button id="+ nameId + ">Dettagli</button>";
-                //productDetails(listProducts[i].code, nameId);
+                detailsCol.innerHTML = "<button id=" + nameId + ">Dettagli</button>";
                 row2.appendChild(codeCol);
                 row2.appendChild(nameCol);
                 row2.appendChild(priceCol);
@@ -151,7 +129,33 @@
             table.appendChild(tableBody);
             searchedProd.appendChild(title);
             searchedProd.appendChild(table);
+
+            for (var i = 0; i < listProducts.length; i++) {
+                const nameId = "detailButton" + listProducts[i].code;
+                productDetails(listProducts[i].code, nameId);
+            }
         }
+    }
+
+    function productDetails(codeProd, nameId) {
+        const button = document.getElementById(nameId);
+
+        button.addEventListener("click",e => {
+                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null );
+                var product = document.getElementById(codeProd);
+                var close = document.getElementsByClassName("close")[0];
+                button.onclick = function() {
+                    product.style.display = "block";
+                }
+                close.onclick = function() {
+                    product.style.display = "none";
+                }
+
+            }
+
+
+        )
+
     }
 
 }) ();
