@@ -2,8 +2,9 @@ package com.polimi.it.tiw_ria.Controllers;
 
 import com.google.gson.Gson;
 import com.polimi.it.tiw_ria.Beans.ShipmentPolicy;
-import com.polimi.it.tiw_ria.DAO.ProductDAO;
+import com.polimi.it.tiw_ria.Beans.Supplier;
 import com.polimi.it.tiw_ria.DAO.ShipmentPolicyDAO;
+import com.polimi.it.tiw_ria.DAO.SupplierDAO;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -14,12 +15,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "getInfoShipmentProduct", value = "/getInfoShipmentProduct")
-public class getInfoShipmentProduct extends HttpServlet {
+@WebServlet(name = "getShipmentPolicies", value = "/getShipmentPolicies")
+public class getShipmentPolicies extends HttpServlet {
+
 
     private Connection connection;
 
-    public getInfoShipmentProduct() {super();}
+    public getShipmentPolicies() {super();}
 
     @Override
     public void init() throws ServletException {
@@ -40,18 +42,22 @@ public class getInfoShipmentProduct extends HttpServlet {
         }
 
     }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int codeProduct = -1;
         HttpSession session = request.getSession();
         String strLogin = (String) session.getAttribute("emailCustomer");
 
+        int codeProduct = -1;
+
         if (strLogin != null) {
+
+            try {
+                codeProduct = Integer.parseInt(request.getParameter("code"));
+            } catch (NumberFormatException ignored) {}
+
             ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
             try {
                 List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPoliciesProduct(codeProduct);
-
                 String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType("application/json");

@@ -276,11 +276,18 @@ hr {
     width: 80%;
 }
 
+#tableShipmentPolicies {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 #detailsPopupContainer {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    padding-top: 5%; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
