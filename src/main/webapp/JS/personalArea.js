@@ -75,10 +75,12 @@
     function printProductSearched(listProducts, searchBar) {
         const searchedProd = document.getElementById("searchedProducts");
         var tableExisted = document.getElementById('tableProductSearched');
+
         if (tableExisted != null) {
             tableExisted.remove();
             document.getElementById('titleSearch').remove();
         }
+
         if (listProducts != null) {
             var title = document.createElement('p')
             title.id = "titleSearch";
@@ -138,10 +140,19 @@
     }
 
     function productDetails(codeProd, nameId) {
-        const button = document.getElementById(nameId);
 
+        const button = document.getElementById(nameId);
         button.addEventListener("click",e => {
-                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null );
+
+                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null,
+                function (request) {
+                switch (request.status) {
+                    case 200:
+                        var shipmentPolicies= JSON.parse(request.responseText);
+                        printShipmentPolicies(shipmentPolicies);
+                }
+            })
+
                 var product = document.getElementById(codeProd);
                 var close = document.getElementsByClassName("close")[0];
                 button.onclick = function() {
@@ -155,6 +166,69 @@
 
 
         )
+
+    }
+
+    function printShipmentPolicies (shipmentPolicies,detailsProduct) {
+
+        const detailsPopup = document.getElementById("detailsPopup");
+        var tableExisted = document.getElementById('tableProductSearched');
+
+        if (shipmentPolicies != null) {
+            var title = document.createElement('p')
+            title.id = "titleDetails";
+
+            var table = document.createElement('table');
+            table.id = "tableProductSearched";
+            var tableBody = document.createElement('tbody');
+
+            searchedProd.style.display = "block";
+
+            var row = document.createElement('tr');
+
+            var thCode = document.createElement('th');
+            var thName = document.createElement('th');
+            var thPrice = document.createElement('th');
+            var thDetails = document.createElement('th');
+
+
+            thCode.textContent = "Codice";
+            row.appendChild(thCode);
+            thName.textContent = "Nome";
+            row.appendChild(thName);
+            thPrice.textContent = "Prezzo";
+            row.appendChild(thPrice);
+            thDetails.textContent = "Dettagli";
+            row.appendChild(thDetails);
+            table.appendChild(row);
+
+            for (var i = 0; i < listProducts.length; i++) {
+                var row2 = document.createElement('tr');
+                var codeCol = document.createElement('td');
+                var nameCol = document.createElement('td');
+                var priceCol = document.createElement('td');
+                var detailsCol = document.createElement('td');
+
+                codeCol.textContent = listProducts[i].code;
+                nameCol.textContent = listProducts[i].name;
+                priceCol.textContent = listProducts[i].price + ".00 \u20ac";
+                const nameId = "detailButton" + listProducts[i].code;
+                detailsCol.innerHTML = "<button id=" + nameId + ">Dettagli</button>";
+                row2.appendChild(codeCol);
+                row2.appendChild(nameCol);
+                row2.appendChild(priceCol);
+                row2.appendChild(detailsCol);
+                tableBody.appendChild(row2);
+            }
+            table.appendChild(tableBody);
+            searchedProd.appendChild(title);
+            searchedProd.appendChild(table);
+
+            for (var i = 0; i < listProducts.length; i++) {
+                const nameId = "detailButton" + listProducts[i].code;
+                productDetails(listProducts[i].code, nameId);
+            }
+        }
 
     }
 
