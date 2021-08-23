@@ -5,6 +5,7 @@
     const welcomeDiv = document.getElementById("welcome");
     const logout_button = document.getElementById("logoutButton");
     const searchBar = document.getElementById("searchBar");
+    var cart = null;
 
 
     if (name != null) {
@@ -132,16 +133,23 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId);
+                productDetails(listProducts[i].code, nameId, listProducts);
             }
         }
     }
 
-    function productDetails(codeProd, nameId) {
+    function productDetails(codeProd, nameId, product) {
         const button = document.getElementById(nameId);
 
         button.addEventListener("click",e => {
-                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null );
+                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null,
+                    function (request) {
+                        switch (request.status) {
+                            case 200:
+                                const shipmentPolicies = JSON.parse(request.responseText);
+                                printProductDetails(shipmentPolicies, product);
+                        }
+                    });
                 var product = document.getElementById(codeProd);
                 var close = document.getElementsByClassName("close")[0];
                 button.onclick = function() {
