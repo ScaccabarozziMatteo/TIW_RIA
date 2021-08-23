@@ -27,7 +27,7 @@
                         }
                     }
                     else
-                        document.getElementById("errormessage").textContent = "Server is loading...";
+                        document.getElementById("errormessage").textContent = "Caricamento in corso...";
                 }
             );
         } else {
