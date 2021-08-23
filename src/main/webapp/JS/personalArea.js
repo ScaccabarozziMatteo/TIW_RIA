@@ -71,6 +71,28 @@
 
     });
 
+    function productDetails(codeProd,nameId) {
+        var button = document.getElementById("detailButton");
+
+        button.addEventListener("click",e => {
+                makeCall("GET" , 'getInfoProduct?code='+codeProd ,null );
+                var product = document.getElementById(codeProd);
+                var close = document.getElementsByClassName("close")[0];
+                button.onclick = function() {
+                    product.style.display = "block";
+                }
+                close.onclick = function() {
+                    product.style.display = "none";
+                }
+
+            }
+
+
+        )
+
+    }
+
+
     function printProductSearched(listProducts, searchBar) {
         const searchedProd = document.getElementById("searchedProducts");
         var tableExisted = document.getElementById('tableProductSearched');
