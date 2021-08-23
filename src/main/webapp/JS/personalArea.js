@@ -80,7 +80,7 @@
             document.getElementById('titleSearch').remove();
         }
         if (listProducts != null) {
-            var title = document.createElement('p')
+            var title = document.createElement('h3')
             title.id = "titleSearch";
             title.textContent = "Elementi trovati per: " + searchBar.value;
 
@@ -132,16 +132,16 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId);
+                productDetails(listProducts[i].code, nameId, listProducts[i]);
             }
         }
     }
 
-    function productDetails(codeProd, nameId) {
+    function productDetails(codeProd, nameId, product) {
         const button = document.getElementById(nameId);
 
         button.addEventListener("click",e => {
-                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null );
+                makeCall("GET" , 'getInfoShipmentProduct?code=' + codeProd ,null );
                 var product = document.getElementById(codeProd);
                 var close = document.getElementsByClassName("close")[0];
                 button.onclick = function() {
