@@ -132,29 +132,54 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId);
+                productDetails(listProducts[i].code, nameId,listProducts[i]);
             }
         }
     }
 
-    function productDetails(codeProd, nameId) {
+    function productDetails(codeProd, nameId, product) {
         const button = document.getElementById(nameId);
-
         button.addEventListener("click",e => {
-                makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null );
-                var product = document.getElementById(codeProd);
-                var close = document.getElementsByClassName("close")[0];
-                button.onclick = function() {
-                    product.style.display = "block";
-                }
-                close.onclick = function() {
-                    product.style.display = "none";
-                }
+
+                makeCall("GET" , 'getInfoShipmentProduct?code=' + codeProd ,null,
+                    function (request) {
+                        switch (request.status) {
+                            case 200:
+                                var shipmentPolicies = JSON.parse(request.responseText);
+                                printProductDetails (shipmentPolicies,product);
+                        }
+                    });
+
+
+
 
             }
 
 
         )
+
+    }
+
+
+    function printProductDetails (shipmentPolicies,product) {
+
+        const detailsPopup = document.getElementById("detailsPopup");
+
+        var title = document.createElement('h3');
+        title.textContent = product.code + " - " + product.name;
+        detailsPopup.appendChild(title);
+        detailsPopup.appendChild(document.createElement("hr"));
+
+        var description = document.createElement("p");
+        description.textContent = product.description;
+
+        var photo = document.createElement("img");
+        photo.src = "upload/"+product.image;
+
+        detailsPopup.appendChild(description);
+        detailsPopup.appendChild(photo);
+
+
 
     }
 
