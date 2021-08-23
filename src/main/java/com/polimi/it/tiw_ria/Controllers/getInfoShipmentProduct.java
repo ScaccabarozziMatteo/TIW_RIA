@@ -1,5 +1,10 @@
 package com.polimi.it.tiw_ria.Controllers;
 
+import com.google.gson.Gson;
+import com.polimi.it.tiw_ria.Beans.ShipmentPolicy;
+import com.polimi.it.tiw_ria.DAO.ProductDAO;
+import com.polimi.it.tiw_ria.DAO.ShipmentPolicyDAO;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
@@ -7,13 +12,14 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
-@WebServlet(name = "getInfoProduct", value = "/getInfoProduct")
-public class getInfoProduct extends HttpServlet {
+@WebServlet(name = "getInfoShipmentProduct", value = "/getInfoShipmentProduct")
+public class getInfoShipmentProduct extends HttpServlet {
 
     private Connection connection;
 
-    public getInfoProduct() {super();}
+    public getInfoShipmentProduct() {super();}
 
     @Override
     public void init() throws ServletException {
@@ -38,7 +44,27 @@ public class getInfoProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int codeProduct = -1;
+        HttpSession session = request.getSession();
+        String strLogin = (String) session.getAttribute("emailCustomer");
 
+        if (strLogin != null) {
+            ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
+            try {
+                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPoliciesProduct(codeProduct);
+
+                String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().println(shipmentPoliciesString);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("Non sei autenticato!");
+        }
     }
 
     @Override
