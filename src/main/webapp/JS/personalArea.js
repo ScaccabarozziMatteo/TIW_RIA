@@ -133,12 +133,12 @@
 
             for (var i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
-                productDetails(listProducts[i].code, nameId, listProducts[i]);
+                productDetails(listProducts[i].code, nameId,listProducts[i]);
             }
         }
     }
 
-    function productDetails(codeProd, nameId, product) {
+    function productDetails(codeProd, nameId,product) {
         const button = document.getElementById(nameId);
 
         button.addEventListener("click",e => {
@@ -148,7 +148,7 @@
                         switch (request.status) {
                             case 200:
                                 var shipmentPolicies = JSON.parse(request.responseText);
-                                printProductDetails (shipmentPolicies, product);
+                                printProductDetails (shipmentPolicies,product);
                         }
                     });
 
@@ -164,16 +164,25 @@
 
 
     function printProductDetails (shipmentPolicies,product) {
-        const detailsPopupContainer = document.getElementById("detailsPopupContainer");
+        const c = document.getElementById("detailsPopupContainer");
 
-        if (document.getElementById("detailsPopup") != null)
+
+        if(document.getElementById("detailsPopup") != null )
             document.getElementById("detailsPopup").remove();
+
         const detailsPopup = document.createElement("div");
         detailsPopup.id = "detailsPopup";
-
         var title = document.createElement('h3');
         title.textContent = product.code + " - " + product.name;
+
+        var textProductDetails = document.createElement("h1");
+        textProductDetails.textContent = "Informazioni dettagliate sull'articolo selezionato";
+
+        var textInfoSeller = document.createElement("h1");
+        textInfoSeller.textContent = "Informazioni sui fornitori che vendono il prodotto selezionato";
         detailsPopup.appendChild(title);
+        detailsPopup.appendChild(textProductDetails);
+        detailsPopup.appendChild(textInfoSeller);
         detailsPopup.appendChild(document.createElement("hr"));
 
         var description = document.createElement("p");
