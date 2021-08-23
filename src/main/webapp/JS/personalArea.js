@@ -61,7 +61,7 @@
                         switch (request.status) {
                             case 200:
                                 var productsSearched = JSON.parse(request.responseText);
-                                printProductSearched(productsSearched)
+                                printProductSearched(productsSearched, searchBar)
                         }
                     })
             }
@@ -71,29 +71,58 @@
 
     });
 
-    function printProductSearched(listProducts) {
+    function printProductSearched(listProducts, searchBar) {
         const searchedProd = document.getElementById("searchedProducts");
         var tableExisted = document.getElementById('tableProductSearched');
-        if (tableExisted != null)
+        if (tableExisted != null) {
             tableExisted.remove();
+            document.getElementById('titleSearch').remove();
+        }
         if (listProducts != null) {
+            var title = document.createElement('p')
+            title.id = "titleSearch";
+            title.textContent = "Elementi trovati per: " + searchBar.value;
+
             var table = document.createElement('table');
             table.id = "tableProductSearched";
             var tableBody = document.createElement('tbody');
 
             searchedProd.style.display = "block";
 
+            var row = document.createElement('tr');
+
+            var thCode = document.createElement('th');
+            var thName = document.createElement('th');
+            var thPrice = document.createElement('th');
+            var thDetails = document.createElement('th');
+
+
+            thCode.textContent = "Codice";
+            row.appendChild(thCode);
+            thName.textContent = "Nome";
+            row.appendChild(thName);
+            thPrice.textContent = "Prezzo";
+            row.appendChild(thPrice);
+            thDetails.textContent = "Dettagli";
+            row.appendChild(thDetails);
+            table.appendChild(row);
+
             for (var i = 0; i < listProducts.length; i++) {
-                var row = document.createElement('tr');
+                var row2 = document.createElement('tr');
+                var codeCol = document.createElement('td');
                 var nameCol = document.createElement('td');
-                var description = document.createElement('td');
+                var priceCol = document.createElement('td');
+                var detailsCol = document.createElement('td');
+
+                codeCol.textContent = listProducts[i].code;
                 nameCol.textContent = listProducts[i].name;
-                description.textContent = listProducts[i].description;
-                row.appendChild(nameCol);
-                row.appendChild(description)
-                tableBody.appendChild(row);
+                priceCol.textContent = listProducts[i].price;
+                row2.appendChild(nameCol);
+                row2.appendChild(priceCol)
+                tableBody.appendChild(row2);
             }
             table.appendChild(tableBody);
+            searchedProd.appendChild(title);
             searchedProd.appendChild(table);
         }
     }
