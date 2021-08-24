@@ -262,7 +262,7 @@ a:hover {
 }
 
 .collapsible:after {
-    content: '\002B73';
+    content: '\002B';
     color: white;
     font-weight: bold;
     float: right;

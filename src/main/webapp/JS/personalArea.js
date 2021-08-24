@@ -8,6 +8,7 @@ var cart = [];
     const logout_button = document.getElementById("logoutButton");
     const searchBar = document.getElementById("searchBar");
     var shipmentPolicies;
+    var orders = [];
 
 
     if (name != null) {
@@ -35,6 +36,8 @@ var cart = [];
     buttonCart.addEventListener('click', function () {
         cartCollapse(false, shipmentPolicies);
     })
+
+    getOrders();
 
     let cartColl = document.getElementById("cartCollapsible")
 
@@ -494,9 +497,7 @@ var cart = [];
             if (document.getElementById("cartMessage") !== null)
                 document.getElementById("cartMessage").remove();
         } else {
-            //if (cart.length !== 0)
-                printCart(contentCart, shipmentPolicies);
-
+            printCart(contentCart, shipmentPolicies);
             content.style.maxHeight = content.scrollHeight + "px";
         }
 
@@ -517,6 +518,16 @@ var cart = [];
 
     function startOrder() {
 
+    }
+
+    function getOrders() {
+        makeCall('GET', 'getOrders', null, function (request) {
+            switch (request.status) {
+                case 200:
+                    orders = JSON.parse(request.responseText);
+                    //printProductDetails (suppliers, product, shipmentPolicies);
+            }
+        })
     }
 
 }) ();
