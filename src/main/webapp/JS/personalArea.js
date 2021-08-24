@@ -30,47 +30,16 @@ var cart = [];
         window.location.replace("index.html");
     })
 
-    var coll = document.getElementsByClassName("collapsible");
-    var cartColl = document.getElementById("cartCollapsible");
-    var contentCart = document.getElementById("contentCart");
+    let cartColl = document.getElementById("cartCollapsible")
 
-    for (let i = 0; i < coll.length; i++) {
-        coll[i].addEventListener("click", function () {
-            this.classList.toggle("active");
-            var content = this.nextElementSibling;
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
-                if (document.getElementById("cartMessage") !== null)
-                    document.getElementById("cartMessage").remove();
-            } else {
-                if (cart.length === 0) {
-                    let cartMessage = document.createElement('h3');
-                    cartMessage.id = 'cartMessage';
-                    cartMessage.textContent = 'Carrello vuoto! :(';
-                    contentCart.appendChild(cartMessage);
-                }
-                else {
-                    for (let y = 0; y < cart.length; y++) {
-                        let cartMessage = document.createElement('h3');
-                        cartMessage.textContent = cart[y].supplier.name;
-                        contentCart.appendChild(cartMessage);
-                        for (let a = 0; a < cart[y].products.length; a++) {
-                            let supplierProduct = document.createElement('p');
-                            supplierProduct.textContent = cart[y].products[a].product.name;
-                            contentCart.appendChild(supplierProduct);
-                        }
-                    }
-                }
-
-                content.style.maxHeight = content.scrollHeight + "px";
-            }
-        });
-    }
+    cartColl.addEventListener("click", function () {
+        cartCollapse();
+    });
 
 
     searchBar.addEventListener("keyup", e => {
 
-        var el = document.getElementById("searchBar");
+        let el = document.getElementById("searchBar");
         el.addEventListener("keypress", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -85,7 +54,7 @@ var cart = [];
                         switch (request.status) {
                             case 200:
                                 var productsSearched = JSON.parse(request.responseText);
-                                printProductSearched(productsSearched, searchBar)
+                                printProductSearched(productsSearched, searchBar);
                         }
                     })
             }
@@ -104,27 +73,34 @@ var cart = [];
             messageExist.remove();
         }
 
+        if (listProducts == null && searchBar == null) {
+            tableExisted.remove();
+            document.getElementById('titleSearch').remove();
+            return;
+        }
+
+
         if (tableExisted != null) {
             tableExisted.remove();
             document.getElementById('titleSearch').remove();
         }
         if (listProducts != null && listProducts.length > 0) {
-            var title = document.createElement('h3')
+            let title = document.createElement('h3')
             title.id = "titleSearch";
             title.textContent = "Elementi trovati per: " + searchBar.value;
 
-            var table = document.createElement('table');
+            let table = document.createElement('table');
             table.id = "tableProductSearched";
-            var tableBody = document.createElement('tbody');
+            let tableBody = document.createElement('tbody');
 
             searchedProd.style.display = "block";
 
-            var row = document.createElement('tr');
+            let row = document.createElement('tr');
 
-            var thCode = document.createElement('th');
-            var thName = document.createElement('th');
-            var thPrice = document.createElement('th');
-            var thDetails = document.createElement('th');
+            let thCode = document.createElement('th');
+            let thName = document.createElement('th');
+            let thPrice = document.createElement('th');
+            let thDetails = document.createElement('th');
 
 
             thCode.textContent = "Codice";
@@ -137,12 +113,12 @@ var cart = [];
             row.appendChild(thDetails);
             table.appendChild(row);
 
-            for (var i = 0; i < listProducts.length; i++) {
-                var row2 = document.createElement('tr');
-                var codeCol = document.createElement('td');
-                var nameCol = document.createElement('td');
-                var priceCol = document.createElement('td');
-                var detailsCol = document.createElement('td');
+            for (let i = 0; i < listProducts.length; i++) {
+                let row2 = document.createElement('tr');
+                let codeCol = document.createElement('td');
+                let nameCol = document.createElement('td');
+                let priceCol = document.createElement('td');
+                let detailsCol = document.createElement('td');
 
                 codeCol.textContent = listProducts[i].code;
                 nameCol.textContent = listProducts[i].name;
@@ -159,7 +135,7 @@ var cart = [];
             searchedProd.appendChild(title);
             searchedProd.appendChild(table);
 
-            for (var i = 0; i < listProducts.length; i++) {
+            for (let i = 0; i < listProducts.length; i++) {
                 const nameId = "detailButton" + listProducts[i].code;
                 productDetails(listProducts[i].code, nameId, listProducts[i]);
             }
@@ -180,9 +156,9 @@ var cart = [];
                     function (request) {
                         switch (request.status) {
                             case 200:
-                                var lists = JSON.parse(request.responseText);
-                                var suppliers = lists[0];
-                                var shipmentPolicies = lists[1];
+                                let lists = JSON.parse(request.responseText);
+                                let suppliers = lists[0];
+                                let shipmentPolicies = lists[1];
                                 printProductDetails (suppliers, product, shipmentPolicies);
                         }
                     });
@@ -207,22 +183,22 @@ var cart = [];
         close.addEventListener("click", ev =>
         detailsPopupContainer.style.display = 'none');
 
-        var title = document.createElement('h3');
+        let title = document.createElement('h3');
         title.textContent = product.name;
         title.style.textAlign = 'center';
         detailsPopup.appendChild(title);
         detailsPopup.appendChild(document.createElement("hr"));
 
-        var code = document.createElement("p");
+        let code = document.createElement("p");
         code.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Codice prodotto: </span>' + product.code;
 
-        var description = document.createElement("p");
+        let description = document.createElement("p");
         description.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Descrizione:</span><br>' + product.description;
 
-        var category = document.createElement("p");
+        let category = document.createElement("p");
         category.innerHTML = '<span style="color:midnightblue; font-weight: bold;">Categoria prodotto: </span>' + product.category;
 
-        var photo = document.createElement("img");
+        let photo = document.createElement("img");
         photo.src = "upload/" + product.image;
         photo.height = 200;
         photo.alt = "imageProduct";
@@ -234,17 +210,17 @@ var cart = [];
         detailsPopup.appendChild(category);
 
 
-        var table = document.createElement('table');
+        let table = document.createElement('table');
         table.id = "tableShipmentPolicies";
-        var tableBody = document.createElement('tbody');
+        let tableBody = document.createElement('tbody');
 
-        var row = document.createElement('tr');
+        let row = document.createElement('tr');
 
-        var thName = document.createElement('th');
-        var thEvaluation = document.createElement('th');
-        var thPrice = document.createElement('th');
-        var thShipmentPolicies = document.createElement('th');
-        var thNumProdCart = document.createElement('th');
+        let thName = document.createElement('th');
+        let thEvaluation = document.createElement('th');
+        let thPrice = document.createElement('th');
+        let thShipmentPolicies = document.createElement('th');
+        let thNumProdCart = document.createElement('th');
 
         thName.textContent = "Nome";
         row.appendChild(thName);
@@ -261,20 +237,20 @@ var cart = [];
         row.appendChild(document.createElement('th'));
         table.appendChild(row);
 
-        for (var x = 0; x < suppliers.length; x++) {
+        for (let x = 0; x < suppliers.length; x++) {
 
-            var row2 = document.createElement('tr');
-            var nameCol = document.createElement('td');
-            var evaluationCol = document.createElement('td');
-            var priceCol = document.createElement('td');
-            var shipmentPoliciesCol = document.createElement('td');
-            var shipmentPoliciesDetails = document.createElement('details');
-            var shipmentPoliciesSummary = document.createElement('summary');
+            let row2 = document.createElement('tr');
+            let nameCol = document.createElement('td');
+            let evaluationCol = document.createElement('td');
+            let priceCol = document.createElement('td');
+            let shipmentPoliciesCol = document.createElement('td');
+            let shipmentPoliciesDetails = document.createElement('details');
+            let shipmentPoliciesSummary = document.createElement('summary');
 
-            var addProductsCartCol = document.createElement('td');
-            var addProductsForm = document.createElement('form');
-            var addProductsInputNumArt = document.createElement('input');
-            var addProductsSubmitInput = document.createElement('input');
+            let addProductsCartCol = document.createElement('td');
+            let addProductsForm = document.createElement('form');
+            let addProductsInputNumArt = document.createElement('input');
+            let addProductsSubmitInput = document.createElement('input');
 
 
 
@@ -289,7 +265,7 @@ var cart = [];
 
 
             shipmentPolicies.forEach(function (element) {
-                var shipPolicyDiv = document.createElement('div');
+                let shipPolicyDiv = document.createElement('div');
                 if (element.supplier === suppliers[x].code && element.min_articles !== 999999999) {
                     shipPolicyDiv.textContent = "Da " + element.min_articles + " a " + element.max_articles + " articoli " + element.costShipment + ".00 \u20ac";
                     shipmentPoliciesDetails.appendChild(shipPolicyDiv);
@@ -307,7 +283,7 @@ var cart = [];
             addProductsSubmitInput.type = 'submit';
             addProductsInputNumArt.name = 'numProducts';
             addProductsSubmitInput.value = 'Inserisci nel carrello';
-            addProductsSubmitInput.id = 'submitQuantity'
+            addProductsInputNumArt.id = 'submitQuantity';
 
             addProductsForm.appendChild(addProductsInputNumArt);
             addProductsForm.appendChild(addProductsSubmitInput);
@@ -325,7 +301,11 @@ var cart = [];
 
             addProductsForm.addEventListener('submit', ev => {
                 ev.preventDefault();
-                addProductsCart(supplier, product)
+                addProductsCart(supplier, product);
+                detailsPopupContainer.style.display = 'none';
+                searchBar.value = '';
+                printProductSearched();
+                cartCollapse(true);
             });
 
 
@@ -341,7 +321,7 @@ var cart = [];
     }
 
     function addProductsCart(supplier, prod) {
-        var quantity = document.getElementById('submitQuantity');
+        var quantity = document.getElementById('submitQuantity').value;
         let cartLength = cart.length;
         let product = null;
         var products = {
@@ -355,11 +335,11 @@ var cart = [];
 
 
         for (let i = 0; i < cartLength; i++) {
-            if (cart[i].order.supplier.code === supplier.code) {
-                let numProd = cart[i].order.products.length;
+            if (cart[i].supplier.code === supplier.code) {
+                let numProd = cart[i].products.length;
                 for (let x = 0; x < numProd; x++) {
-                    if (cart[i].order.products[x].product.code === prod.code) {
-
+                    if (cart[i].products[x].product.code === prod.code) {
+                        cart[i].products[x].quantity = Number.parseInt(cart[i].products[x].quantity) + Number.parseInt(quantity);
                     }
                 }
                 return false;
@@ -372,6 +352,89 @@ var cart = [];
         cart.push(order);
 
         return false;
+    }
+
+    function printCart(contentCart) {
+
+        let containerCartContent = document.createElement('div');
+        containerCartContent.id = 'containerCartContent';
+
+        for (let y = 0; y < cart.length; y++) {
+            let cartMessage = document.createElement('h3');
+            cartMessage.textContent = cart[y].supplier.name;
+
+            let table = document.createElement('table');
+            let row1 = document.createElement('tr');
+
+            let thName = document.createElement('th');
+            thName.textContent = 'Nome';
+            row1.appendChild(thName);
+            let thQuantity = document.createElement('th');
+            thQuantity.textContent = 'Quantità';
+            row1.appendChild(thQuantity);
+            let thCostShipment = document.createElement('th');
+            thCostShipment.textContent = 'Costo Spedizione';
+            row1.appendChild(thCostShipment);
+            let thTotal = document.createElement('th');
+            thTotal.textContent = 'Totale';
+            row1.appendChild(thTotal);
+            let thDelete = document.createElement('th');
+            thDelete.textContent = 'Elimina';
+            row1.appendChild(thDelete);
+
+            table.appendChild(row1);
+            containerCartContent.appendChild(table);
+
+            contentCart.appendChild(cartMessage);
+            for (let a = 0; a < cart[y].products.length; a++) {
+                let row2 = document.createElement('tr');
+
+                let nameProduct = document.createElement('td');
+                nameProduct.textContent = cart[y].products[a].product.name;
+                let numProducts = document.createElement('td');
+                numProducts.textContent = cart[y].products[a].quantity;
+                let totalProd = document.createElement('td');
+                let total = parseFloat(cart[y].products[a].product.price) * parseInt(cart[y].products[a].quantity);
+                totalProd.textContent = total.toString() + ".00 \u20ac";
+                row2.appendChild(nameProduct);
+                row2.appendChild(numProducts);
+                row2.appendChild(document.createElement('td'));
+                row2.appendChild(totalProd);
+                row2.appendChild(document.createElement('td'));
+                table.appendChild(row2);
+            }
+            contentCart.appendChild(containerCartContent);
+        }
+
+    }
+
+    function cartCollapse(collapse) {
+        let cartColl = document.getElementById("cartCollapsible");
+        let contentCart = document.getElementById("contentCart");
+
+        cartColl.classList.toggle("active");
+        var content = cartColl.nextElementSibling;
+        if (collapse)
+            content.style.maxHeight = null;
+
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            if (document.getElementById("cartMessage") !== null)
+                document.getElementById("cartMessage").remove();
+        } else {
+            if (cart.length === 0) {
+                let cartMessage = document.createElement('h3');
+                cartMessage.id = 'cartMessage';
+                cartMessage.textContent = 'Carrello vuoto! :(';
+                contentCart.appendChild(cartMessage);
+            }
+            else {
+                printCart(contentCart);
+            }
+
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+
     }
 
 }) ();
