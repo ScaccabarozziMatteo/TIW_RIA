@@ -59,7 +59,7 @@ public class getInfoProduct extends HttpServlet {
             ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
             try {
                 List<Supplier> suppliers = supplierDAO.getInfoSuppliersShipment(codeProduct);
-                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPoliciesProduct(codeProduct);
+                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyListComplete();
 
                 String suppliersString = new Gson().toJson(suppliers);
                 String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);

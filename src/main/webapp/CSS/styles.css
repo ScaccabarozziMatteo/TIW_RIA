@@ -157,6 +157,15 @@ body {
     min-height: 100% !important;
 }
 
+#bin {
+    font-size: 30px;
+}
+
+#bin:hover {
+    color: red;
+    cursor: pointer;
+}
+
 th, td {
     text-align: center;
     padding: 8px;
@@ -289,7 +298,7 @@ hr {
     z-index: 1; /* Sit on top */
     padding-top: 5%; /* Location of the box */
     left: 0;
-    top: 0;
+    bottom: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
@@ -310,8 +319,7 @@ hr {
 #detailsPopup {
     position: relative;
     background-color: #fefefe;
-    margin: auto;
-    padding: 0;
+    margin: 5% auto;
     border: 1px solid #888;
     width: 80%;
     overflow: auto;

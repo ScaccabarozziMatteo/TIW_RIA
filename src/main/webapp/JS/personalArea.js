@@ -7,6 +7,7 @@ var cart = [];
     const welcomeDiv = document.getElementById("welcome");
     const logout_button = document.getElementById("logoutButton");
     const searchBar = document.getElementById("searchBar");
+    var shipmentPolicies;
 
 
     if (name != null) {
@@ -30,10 +31,15 @@ var cart = [];
         window.location.replace("index.html");
     })
 
+    let buttonCart = document.getElementById('cartButton');
+    buttonCart.addEventListener('click', function () {
+        cartCollapse(false, shipmentPolicies);
+    })
+
     let cartColl = document.getElementById("cartCollapsible")
 
     cartColl.addEventListener("click", function () {
-        cartCollapse();
+        cartCollapse(false, shipmentPolicies);
     });
 
 
@@ -158,7 +164,7 @@ var cart = [];
                             case 200:
                                 let lists = JSON.parse(request.responseText);
                                 let suppliers = lists[0];
-                                let shipmentPolicies = lists[1];
+                                shipmentPolicies = lists[1];
                                 printProductDetails (suppliers, product, shipmentPolicies);
                         }
                     });
@@ -180,8 +186,7 @@ var cart = [];
         close.style.fontSize = '30px';
         detailsPopup.appendChild(close);
 
-        close.addEventListener("click", ev =>
-        detailsPopupContainer.style.display = 'none');
+        close.addEventListener("click", ev => detailsPopupContainer.style.display = 'none');
 
         let title = document.createElement('h3');
         title.textContent = product.name;
@@ -282,6 +287,7 @@ var cart = [];
             addProductsInputNumArt.type = 'number';
             addProductsSubmitInput.type = 'submit';
             addProductsInputNumArt.name = 'numProducts';
+            addProductsInputNumArt.required;
             addProductsSubmitInput.value = 'Inserisci nel carrello';
             addProductsInputNumArt.id = 'submitQuantity';
 
@@ -300,12 +306,16 @@ var cart = [];
             let supplier = suppliers[x];
 
             addProductsForm.addEventListener('submit', ev => {
-                ev.preventDefault();
-                addProductsCart(supplier, product);
-                detailsPopupContainer.style.display = 'none';
-                searchBar.value = '';
-                printProductSearched();
-                cartCollapse(true);
+                if (addProductsInputNumArt.value === '')
+                    ev.preventDefault();
+                else {
+                    ev.preventDefault();
+                    addProductsCart(supplier, product, addProductsInputNumArt.value);
+                    detailsPopupContainer.style.display = 'none';
+                    searchBar.value = '';
+                    printProductSearched();
+                    cartCollapse(true, shipmentPolicies);
+                }
             });
 
 
@@ -320,15 +330,15 @@ var cart = [];
 
     }
 
-    function addProductsCart(supplier, prod) {
-        var quantity = document.getElementById('submitQuantity').value;
+    function addProductsCart(supplier, prod, quantity) {
         let cartLength = cart.length;
         let product = null;
-        var products = {
+        let added = false;
+        let products = {
             product,
             quantity
         };
-        var order = {
+        let order = {
             products: [],
             supplier
         };
@@ -340,9 +350,17 @@ var cart = [];
                 for (let x = 0; x < numProd; x++) {
                     if (cart[i].products[x].product.code === prod.code) {
                         cart[i].products[x].quantity = Number.parseInt(cart[i].products[x].quantity) + Number.parseInt(quantity);
+                        added = true;
                     }
                 }
-                return false;
+                if (added)  // Se l'elemento è stato aggiunto termina la funzione di inserimento
+                    return false;
+                else {      // Se elemento non esiste ma c'è il fornitore
+                    products.product = prod;
+                    products.quantity = quantity;
+                    cart[i].products.push(products);
+                    return;
+                }
             }
         }
         order.supplier = supplier;
@@ -350,20 +368,33 @@ var cart = [];
         products.quantity = quantity;
         order.products.push(products);
         cart.push(order);
-
-        return false;
     }
 
-    function printCart(contentCart) {
+    function printCart(contentCart, shipmentPolicies) {
 
+        if (document.getElementById('containerCartContent') != null)
+            document.getElementById('containerCartContent').remove();
         let containerCartContent = document.createElement('div');
         containerCartContent.id = 'containerCartContent';
 
+        if (cart.length === 0) {
+            let message = document.createElement('h3');
+            message.textContent = 'Carrello vuoto! :('
+            containerCartContent.appendChild(message);
+            contentCart.appendChild(containerCartContent);
+            return;
+        }
+
         for (let y = 0; y < cart.length; y++) {
-            let cartMessage = document.createElement('h3');
-            cartMessage.textContent = cart[y].supplier.name;
+            let totalCost = 0;
+            let totalQuantity = 0;
+
+            let supplierName = document.createElement('h3');
+            supplierName.textContent = cart[y].supplier.name;
+            containerCartContent.appendChild(supplierName);
 
             let table = document.createElement('table');
+            let tableBody = document.createElement('tbody');
             let row1 = document.createElement('tr');
 
             let thName = document.createElement('th');
@@ -383,9 +414,7 @@ var cart = [];
             row1.appendChild(thDelete);
 
             table.appendChild(row1);
-            containerCartContent.appendChild(table);
 
-            contentCart.appendChild(cartMessage);
             for (let a = 0; a < cart[y].products.length; a++) {
                 let row2 = document.createElement('tr');
 
@@ -393,22 +422,65 @@ var cart = [];
                 nameProduct.textContent = cart[y].products[a].product.name;
                 let numProducts = document.createElement('td');
                 numProducts.textContent = cart[y].products[a].quantity;
+                totalQuantity += parseInt(cart[y].products[a].quantity);
                 let totalProd = document.createElement('td');
                 let total = parseFloat(cart[y].products[a].product.price) * parseInt(cart[y].products[a].quantity);
+                totalCost += total;
                 totalProd.textContent = total.toString() + ".00 \u20ac";
                 row2.appendChild(nameProduct);
                 row2.appendChild(numProducts);
                 row2.appendChild(document.createElement('td'));
                 row2.appendChild(totalProd);
-                row2.appendChild(document.createElement('td'));
-                table.appendChild(row2);
+                let deleteTd = document.createElement('td');
+                let deleteSpan = document.createElement('span');
+                deleteSpan.textContent = '🗑';
+                deleteSpan.id = 'bin';
+                deleteTd.appendChild(deleteSpan);
+                deleteSpan.addEventListener('click', function (){
+                    cart[y].products.splice(a, 1);
+                    if (cart[y].products.length === 0)
+                        cart.splice(y, 1);
+                    printCart(contentCart, shipmentPolicies);
+                });
+                row2.appendChild(deleteTd);
+                tableBody.appendChild(row2);
             }
-            contentCart.appendChild(containerCartContent);
+            let lastRow = document.createElement('tr');
+            let totalCol = document.createElement('td');
+            totalCol.textContent = 'Totale';
+            let totalShipCostCol = document.createElement('td');
+            let totalShipCost = 0;
+            totalShipCost = getShipmentCost(cart[y].supplier.code, shipmentPolicies, totalCost, totalQuantity);
+            totalShipCostCol.textContent = totalShipCost.toString() +  ".00 \u20ac";
+            let totalCostCol = document.createElement('td');
+            let totalVar = totalShipCost + totalCost;
+            totalCostCol.textContent = totalVar.toString() +  ".00 \u20ac";
+            let orderButtonCol = document.createElement('td');
+            let orderButton = document.createElement('button');
+            orderButton.textContent = 'Ordina tutti i prodotti di questo fornitore!';
+            orderButtonCol.appendChild(orderButton);
+
+            orderButton.addEventListener('click', function() {
+                startOrder();
+            })
+
+
+            lastRow.appendChild(totalCol);
+            lastRow.appendChild(document.createElement('td'));
+            lastRow.appendChild(totalShipCostCol);
+            lastRow.appendChild(totalCostCol);
+            lastRow.appendChild(orderButtonCol);
+            tableBody.appendChild(lastRow);
+
+            table.appendChild(tableBody);
+            containerCartContent.appendChild(table);
+
         }
+        contentCart.appendChild(containerCartContent);
 
     }
 
-    function cartCollapse(collapse) {
+    function cartCollapse(collapse, shipmentPolicies) {
         let cartColl = document.getElementById("cartCollapsible");
         let contentCart = document.getElementById("contentCart");
 
@@ -422,18 +494,28 @@ var cart = [];
             if (document.getElementById("cartMessage") !== null)
                 document.getElementById("cartMessage").remove();
         } else {
-            if (cart.length === 0) {
-                let cartMessage = document.createElement('h3');
-                cartMessage.id = 'cartMessage';
-                cartMessage.textContent = 'Carrello vuoto! :(';
-                contentCart.appendChild(cartMessage);
-            }
-            else {
-                printCart(contentCart);
-            }
+            //if (cart.length !== 0)
+                printCart(contentCart, shipmentPolicies);
 
             content.style.maxHeight = content.scrollHeight + "px";
         }
+
+    }
+
+    function getShipmentCost(supplierCode, shipmentPolicies, totalCost, totalQuantity) {
+        let cost = 0;
+        for (let i = 0; i < shipmentPolicies.length; i++) {
+            if (shipmentPolicies[i].supplier === supplierCode) {
+                if (parseFloat(totalCost) >= parseFloat(shipmentPolicies[i].freeShipment) && shipmentPolicies[i].min_articles === 999999999)
+                    return 0;
+                else if (parseInt(shipmentPolicies[i].min_articles) <= totalQuantity && totalQuantity <= parseInt(shipmentPolicies[i].max_articles))
+                    cost = parseFloat(shipmentPolicies[i].costShipment);
+            }
+        }
+        return cost;
+    }
+
+    function startOrder() {
 
     }
 

@@ -36,6 +36,25 @@ public class ShipmentPolicyDAO {
         return shipmentPolicies;
     }
 
+    public List<ShipmentPolicy> shipmentPolicyListComplete() throws SQLException {
+        List<ShipmentPolicy> shipmentPolicies = new ArrayList<>();
+
+        String SQLQuery = "SELECT * FROM dbtest.shipment_policy ORDER BY min_articles";
+
+        try (PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                ShipmentPolicy shipmentPolicy = new ShipmentPolicy(resultSet.getInt("id"), resultSet.getInt("min_articles"), resultSet.getInt("max_articles"), resultSet.getString("supplier"), resultSet.getFloat("cost_shipment"), resultSet.getFloat("free_shipment"));
+                shipmentPolicies.add(shipmentPolicy);
+            }
+        }
+        if (shipmentPolicies.isEmpty())
+            return null;
+
+        return shipmentPolicies;
+    }
+
     public List<ShipmentPolicy> shipmentPoliciesProduct(int prodCode) throws SQLException {
         List<ShipmentPolicy> shipmentPolicies = new ArrayList<>();
 
