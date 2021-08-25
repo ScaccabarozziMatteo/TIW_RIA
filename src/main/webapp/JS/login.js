@@ -35,4 +35,8 @@
         }
     });
 
+    if (sessionStorage.getItem('username').length > 0) {
+        window.location.replace("PersonalArea.html");
+    }
+
 })();

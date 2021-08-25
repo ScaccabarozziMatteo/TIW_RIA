@@ -7,6 +7,7 @@ import com.polimi.it.tiw_ria.Beans.Product;
 import com.polimi.it.tiw_ria.DAO.OrderDAO;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.*;
@@ -102,6 +103,9 @@ public class Orders extends HttpServlet {
             List<Product> products = new ArrayList<>();
             int quantity;
             int codeProd;
+            float shipmentFees;
+            float totalCost;
+            float price;
 
             String supplierCode;
 
@@ -116,34 +120,51 @@ public class Orders extends HttpServlet {
 
             try {
                 supplierCode = JSONObj.getJSONObject("supplier").getString("code");
-                JSONArr = JSONObj.getJSONArray("product");
+                shipmentFees = JSONObj.getFloat("costShipment");
+                totalCost = JSONObj.getFloat("subtotal");
+                JSONArr = JSONObj.getJSONArray("products");
 
-                if (!supplierCode.isEmpty()) {
+                if (!supplierCode.isEmpty() && totalCost > 0 && shipmentFees > -1) {
                     order = new Order(supplierCode);
 
                     for (int i = 0; i < JSONArr.length(); i++) {
-                        quantity = JSONArr.getJSONObject(i).getInt("quantity");
-                        codeProd = JSONArr.getJSONObject(i).getInt("code");
+                        quantity = JSONArr.getJSONObject(i).getJSONObject("product").getInt("quantity");
+                        codeProd = JSONArr.getJSONObject(i).getJSONObject("product").getInt("code");
+                        price = JSONArr.getJSONObject(i).getJSONObject("product").getFloat("price");
 
-                        if (quantity > 0 && codeProd > 0) {
+                        if (quantity > 0 && codeProd > 0 && price > 0) {
 
-                            products.add(new Product(codeProd, quantity));
+                            Product product = new Product(codeProd, quantity);
+                            product.setPrice(price);
+                            products.add(product);
 
 
-                            response.setStatus(HttpServletResponse.SC_OK);
+
 
                         } else {
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                             response.getWriter().println("Parametri non validi!");
+                            return;
                         }
                     }
+
+                    order.setShipmentFees(shipmentFees);
+                    order.setTotal(totalCost);
+                    order.setProducts(products);
+
+                    orderDAO.sentOrder(order, strLogin);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().println("Parametri non validi!");
+                    return;
                 }
-            } catch (org.json.JSONException e) {
+            } catch (JSONException | SQLException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("Parametri non validi!");
+                return;
             }
 
 

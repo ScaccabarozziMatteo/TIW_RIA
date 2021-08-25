@@ -2,9 +2,9 @@
 
     var name = sessionStorage.getItem('username');
     var sex = sessionStorage.getItem('sex');
-    const welcomeDiv = document.getElementById("welcome");
-    const logout_button = document.getElementById("logoutButton");
-    const searchBar = document.getElementById("searchBar");
+    let welcomeDiv = document.getElementById("welcome");
+    let logout_button = document.getElementById("logoutButton");
+    let searchBar = document.getElementById("searchBar");
     var shipmentPolicies;
     var orders = [];
     var cart = [];
@@ -13,13 +13,13 @@
     if (name != null) {
         switch (sex) {
             case 'male':
-                welcomeDiv.innerHTML = "Benvenuto " + name;
+                welcomeDiv.textContent = "Benvenuto " + name;
                 break;
             case 'female':
-                welcomeDiv.innerHTML = "Benvenuta " + name;
+                welcomeDiv.textContent = "Benvenuta " + name;
                 break;
             case null:
-                welcomeDiv.innerHTML = "Benvenut* " + name;
+                welcomeDiv.textContent = "Benvenut* " + name;
                 break;
         }
     }
@@ -52,7 +52,7 @@
     let ordersColl = document.getElementById("ordersCollapsible");
 
     ordersColl.addEventListener("click", function () {
-        orderCollapse(false);
+        orderCollapse();
     });
 
 
@@ -70,10 +70,15 @@
             if (e.key !== 'Enter') {
                 makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
                     function (request) {
-                        switch (request.status) {
-                            case 200:
-                                var productsSearched = JSON.parse(request.responseText);
-                                printProductSearched(productsSearched, searchBar);
+                        if (request.readyState === XMLHttpRequest.DONE) {
+                            switch (request.status) {
+                                case 200:
+                                    var productsSearched = JSON.parse(request.responseText);
+                                    printProductSearched(productsSearched, searchBar);
+                                    break;
+                                default:
+                                    window.location.replace("errorPage.html");
+                            }
                         }
                     })
             }
@@ -180,6 +185,9 @@
                                     let suppliers = lists[0];
                                     shipmentPolicies = lists[1];
                                     printProductDetails(suppliers, product, shipmentPolicies);
+                                    break;
+                                default:
+                                    window.location.replace("errorPage.html");
                             }
                         }
                     });
@@ -350,13 +358,16 @@
         let cartLength = cart.length;
         let product = null;
         let added = false;
+        let subtotal = 0;
+        let costShipment = 0;
         let products = {
             product,
-            quantity
         };
         let order = {
             products: [],
-            supplier
+            supplier,
+            costShipment,
+            subtotal
         };
 
 
@@ -365,7 +376,7 @@
                 let numProd = cart[i].products.length;
                 for (let x = 0; x < numProd; x++) {
                     if (cart[i].products[x].product.code === prod.code) {
-                        cart[i].products[x].quantity = Number.parseInt(cart[i].products[x].quantity) + Number.parseInt(quantity);
+                        cart[i].products[x].product.quantity = Number.parseInt(cart[i].products[x].product.quantity) + Number.parseInt(quantity);
                         added = true;
                     }
                 }
@@ -373,7 +384,7 @@
                     return false;
                 else {      // Se elemento non esiste ma c'è il fornitore
                     products.product = prod;
-                    products.quantity = quantity;
+                    products.product.quantity = quantity;
                     cart[i].products.push(products);
                     return;
                 }
@@ -381,7 +392,7 @@
         }
         order.supplier = supplier;
         products.product = prod;
-        products.quantity = quantity;
+        products.product.quantity = quantity;
         order.products.push(products);
         cart.push(order);
     }
@@ -441,11 +452,12 @@
                 let nameProduct = document.createElement('td');
                 nameProduct.textContent = cart[y].products[a].product.name;
                 let numProducts = document.createElement('td');
-                numProducts.textContent = cart[y].products[a].quantity;
-                totalQuantity += parseInt(cart[y].products[a].quantity);
+                numProducts.textContent = cart[y].products[a].product.quantity;
+                totalQuantity += parseInt(cart[y].products[a].product.quantity);
                 let totalProd = document.createElement('td');
-                let total = parseFloat(cart[y].products[a].product.price) * parseInt(cart[y].products[a].quantity);
+                let total = parseFloat(cart[y].products[a].product.price) * parseInt(cart[y].products[a].product.quantity);
                 totalCost += total;
+                cart[y].subtotal = totalCost;       // Set subtotal cost of this order in cart
                 totalProd.textContent = total.toString() + ".00 \u20ac";
                 row2.appendChild(nameProduct);
                 row2.appendChild(numProducts);
@@ -471,6 +483,7 @@
             let totalShipCostCol = document.createElement('td');
             let totalShipCost = 0;
             totalShipCost = getShipmentCost(cart[y].supplier.code, totalCost, totalQuantity);
+            cart[y].costShipment = totalShipCost;       // Set shipment cost of this order in cart
             totalShipCostCol.textContent = totalShipCost.toString() +  ".00 \u20ac";
             let totalCostCol = document.createElement('td');
             let totalVar = totalShipCost + totalCost;
@@ -511,6 +524,9 @@
         if (collapse)
             content.style.maxHeight = null;
 
+        if (collapse === -1)
+            content.style.maxHeight = content.scrollHeight + "px";
+
         if (content.style.maxHeight) {
             content.style.maxHeight = null;
             if (document.getElementById("cartMessage") !== null)
@@ -530,6 +546,8 @@
         if (collapse)
             content.style.maxHeight = null;
 
+        if (collapse === -1)
+            content.style.maxHeight = content.scrollHeight + "px";
 
         if (content.style.maxHeight) {
             content.style.maxHeight = null;
@@ -569,14 +587,15 @@
     function sentOrder(order) {
         sendJSON('Orders', order, function (request) {
             if (request.readyState === XMLHttpRequest.DONE) {
+                let message = request.responseText;
                 switch (request.status) {
                     case 200:
                         getOrders();
                         cartCollapse(true, shipmentPolicies);
+                        orderCollapse(-1);
                         break;
                     default:
-                        let message = document.getElementById("errorMessagePage");
-                        message.textContent = request.responseText;
+                        alert(message);
                         window.location.replace("errorPage.html");
                 }
             }
@@ -585,9 +604,14 @@
 
     function getOrders() {
         makeCall('GET', 'Orders', null, function (request) {
-            switch (request.status) {
-                case 200:
-                    orders = JSON.parse(request.responseText);
+            if (request.readyState === XMLHttpRequest.DONE) {
+                switch (request.status) {
+                    case 200:
+                        orders = JSON.parse(request.responseText);
+                        break;
+                    default:
+                        window.location.replace("errorPage.html");
+                }
             }
         })
     }
@@ -625,15 +649,16 @@
             let thQuantity = document.createElement('th');
             thQuantity.textContent = 'Quantità';
             row1.appendChild(thQuantity);
+            let thPhoto = document.createElement('th');
+            thPhoto.textContent = 'Foto';
+            row1.appendChild(thPhoto);
             let thCostShipment = document.createElement('th');
             thCostShipment.textContent = 'Costo Spedizione';
             row1.appendChild(thCostShipment);
             let thTotal = document.createElement('th');
             thTotal.textContent = 'Totale';
             row1.appendChild(thTotal);
-            let thPhoto = document.createElement('th');
-            thPhoto.textContent = 'Foto';
-            row1.appendChild(thPhoto);
+
 
             table.appendChild(row1);
 
@@ -670,7 +695,8 @@
             let totalShipCostCol = document.createElement('td');
             totalShipCostCol.textContent = orders[y].shipmentFees +  ".00 \u20ac";
             let totalCostCol = document.createElement('td');
-            totalCostCol.textContent = orders[y].total +  ".00 \u20ac";
+            let totalCost = Number(orders[y].total) + Number(orders[y].shipmentFees);
+            totalCostCol.textContent = totalCost +  ".00 \u20ac";
 
 
             lastRow.appendChild(totalCol);
