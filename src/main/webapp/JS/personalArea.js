@@ -5,6 +5,7 @@
     let welcomeDiv = document.getElementById("welcome");
     let logout_button = document.getElementById("logoutButton");
     let searchBar = document.getElementById("searchBar");
+    let homeButton = document.getElementById("homeButton");
     var shipmentPolicies;
     var orders = [];
     var cart = [];
@@ -34,6 +35,10 @@
     let buttonCart = document.getElementById('cartButton');
     buttonCart.addEventListener('click', function () {
         cartCollapse(true, shipmentPolicies);
+    })
+
+    homeButton.addEventListener('click', function () {
+        homeAction();
     })
 
     getOrders();
@@ -75,6 +80,8 @@
                                 case 200:
                                     var productsSearched = JSON.parse(request.responseText);
                                     printProductSearched(productsSearched, searchBar);
+                                    window.location.href = "#welcome";
+                                    document.getElementById('searchBar').focus();
                                     break;
                                 default:
                                     window.location.replace("errorPage.html");
@@ -249,6 +256,7 @@
         let thPrice = document.createElement('th');
         let thShipmentPolicies = document.createElement('th');
         let thNumProdCart = document.createElement('th');
+        let quantity = document.createElement('th');
 
         thName.textContent = "Nome";
         row.appendChild(thName);
@@ -262,7 +270,8 @@
         row.appendChild(thShipmentPolicies);
         thNumProdCart.textContent = "#prodotti del fornitore nel carrello";
         row.appendChild(thNumProdCart);
-        row.appendChild(document.createElement('th'));
+        quantity.textContent = 'Quantità';
+        row.appendChild(quantity);
         table.appendChild(row);
 
         for (let x = 0; x < suppliers.length; x++) {
@@ -311,6 +320,7 @@
             addProductsSubmitInput.type = 'submit';
             addProductsInputNumArt.name = 'numProducts';
             addProductsInputNumArt.required;
+            addProductsInputNumArt.placeholder = 'Quantità';
             addProductsSubmitInput.value = 'Inserisci nel carrello';
             addProductsSubmitInput.id = 'submitQuantityButton'
             addProductsInputNumArt.id = 'submitQuantity';
@@ -726,6 +736,13 @@
                 }
             }
         })
+    }
+
+    function homeAction() {
+        document.getElementById('searchedProducts').style.display = 'none';
+        cartCollapse(-1, shipmentPolicies);
+        orderCollapse(-1);
+
     }
 
 }) ();
