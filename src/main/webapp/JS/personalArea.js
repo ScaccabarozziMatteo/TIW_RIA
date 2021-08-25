@@ -1,14 +1,18 @@
 (function () {
 
+
     var name = sessionStorage.getItem('username');
     var sex = sessionStorage.getItem('sex');
     let welcomeDiv = document.getElementById("welcome");
     let logout_button = document.getElementById("logoutButton");
     let searchBar = document.getElementById("searchBar");
     let homeButton = document.getElementById("homeButton");
+
     var shipmentPolicies;
     var orders = [];
     var cart = [];
+    var fiveProducts;
+    var viewedElements = [];
 
 
     if (name != null) {
@@ -27,6 +31,8 @@
     else
         window.location.replace("index.html");
 
+    get5products();
+
     logout_button.addEventListener("click", ev => {
         sessionStorage.clear();
         window.location.replace("index.html");
@@ -34,7 +40,7 @@
 
     let buttonCart = document.getElementById('cartButton');
     buttonCart.addEventListener('click', function () {
-        cartCollapse(true, shipmentPolicies);
+        cartCollapse(true, shipmentPolicies, true);
     })
 
     homeButton.addEventListener('click', function () {
@@ -51,7 +57,7 @@
 
     let ordersButtonNav = document.getElementById('orderButtonNav');
     ordersButtonNav.addEventListener('click', function () {
-        orderCollapse(true);
+        orderCollapse(true, true);
     })
 
     let ordersColl = document.getElementById("ordersCollapsible");
@@ -59,7 +65,6 @@
     ordersColl.addEventListener("click", function () {
         orderCollapse();
     });
-
 
     searchBar.addEventListener("keyup", e => {
 
@@ -70,7 +75,6 @@
             }
         });
 
-
         if (searchBar.value !== '') {
             if (e.key !== 'Enter') {
                 makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
@@ -80,7 +84,7 @@
                                 case 200:
                                     var productsSearched = JSON.parse(request.responseText);
                                     printProductSearched(productsSearched, searchBar);
-                                    window.location.href = "#welcome";
+                                    window.location.href = "#searchedProducts";
                                     document.getElementById('searchBar').focus();
                                     break;
                                 default:
@@ -91,7 +95,6 @@
             }
         }  else
                 printProductSearched(null);
-
 
     });
 
@@ -533,7 +536,7 @@
 
     }
 
-    function cartCollapse(collapse, shipmentPolicies) {
+    function cartCollapse(collapse, shipmentPolicies, anchor) {
         let cartColl = document.getElementById("cartCollapsible");
         let contentCart = document.getElementById("contentCart");
 
@@ -554,9 +557,14 @@
             content.style.maxHeight = content.scrollHeight + "px";
         }
 
+        setTimeout(() => {
+            if (anchor)
+                window.location.href = "#cartCollapsible";
+            }, 300);
+
     }
 
-    function orderCollapse(collapse) {
+    function orderCollapse(collapse, anchor) {
         let orderColl = document.getElementById("ordersCollapsible");
 
         orderColl.classList.toggle("active");
@@ -575,6 +583,11 @@
             printOrders();
             content.style.maxHeight = content.scrollHeight + "px";
         }
+
+        setTimeout(() => {
+            if (anchor)
+                window.location.href = "#ordersCollapsible";
+        }, 300);
 
     }
 
@@ -761,6 +774,80 @@
         cartCollapse(-1, shipmentPolicies);
         orderCollapse(-1);
 
+    }
+
+    function get5products() {
+        makeCall('GET', 'get5products', null, function (request) {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                switch (request.status) {
+                    case 200:
+                        fiveProducts = JSON.parse(request.responseText);
+                        printADVprod()
+                        break;
+                    default:
+                        window.location.replace("errorPage.html");
+                }
+            }
+        })
+    }
+
+    function printADVprod() {
+        let divID = document.getElementById('adv');
+
+        if (document.getElementById('advTable') !== null) {
+            document.getElementById('advTable').remove();
+            document.getElementById('advTitle').remove();
+        }
+
+        let advTitle = document.createElement('h3');
+        advTitle.id = 'advTitle';
+        advTitle.textContent = 'Ecco un pò di consigli scelti apposta per te:';
+        divID.appendChild(advTitle);
+        let advTable = document.createElement('table');
+        let advTableBody = document.createElement('tbody');
+        let advRow = document.createElement('tr');
+        advRow.style.backgroundColor = 'white';
+
+        let vw = 0;
+        let five = 0;
+        for(let a = 0; a < 5; a++) {
+            let advCol = document.createElement('td');
+            let advDiv = document.createElement('div');
+            let advImg = document.createElement('img');
+            let advP1 = document.createElement('p');
+            let advP2 = document.createElement('p');
+
+            if (viewedElements.length < vw) {
+                advImg.src = "upload/" + viewedElements[vw].image;
+                advImg.height = 200;
+                advImg.alt = "imageProduct";
+
+                advP1.textContent = viewedElements[vw].name;
+                advP2.textContent = 'Prodotto visto di recente'
+                advP2.className = 'viewedMessage';
+                vw++;
+            }
+            else {
+                advImg.src = "upload/" + fiveProducts[five].image;
+                advImg.height = 200;
+                advImg.alt = "imageProduct";
+
+                advP1.textContent = fiveProducts[five].name;
+                advP2.textContent = 'Offerta speciale!'
+                advP2.className = 'saleMessage';
+                five++;
+            }
+
+            advDiv.appendChild(advImg);
+            advDiv.appendChild(advP1);
+            advDiv.appendChild(advP2);
+            advCol.appendChild(advDiv);
+            advRow.appendChild(advCol);
+        }
+
+        advTableBody.appendChild(advRow);
+        advTable.appendChild(advTableBody);
+        divID.appendChild(advTable);
     }
 
 }) ();

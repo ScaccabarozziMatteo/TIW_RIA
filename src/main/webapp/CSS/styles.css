@@ -1,3 +1,7 @@
+html{
+    scroll-behavior:smooth;
+}
+
 .column {
     width: 45%;
     padding-bottom: 10px;
@@ -97,7 +101,7 @@
 .navigation-bar {
     background-color: #EDF2F5;
     height: 70px;
-    width: 100%;
+    width: 99%;
     text-align:left;
     border-radius: 20px;
     position: fixed;
@@ -384,6 +388,7 @@ input[type=text]:focus, input[type=password]:focus {
 
 #searchedProducts {
     display: none;
+    scroll-margin-top: 7em;
 }
 
 hr {
