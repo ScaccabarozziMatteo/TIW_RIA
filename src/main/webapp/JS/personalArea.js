@@ -143,7 +143,7 @@
                 nameCol.textContent = listProducts[i].name;
                 priceCol.textContent = listProducts[i].price + ".00 \u20ac";
                 const nameId = "detailButton" + listProducts[i].code;
-                detailsCol.innerHTML = "<button id=" + nameId + ">Dettagli</button>";
+                detailsCol.innerHTML = "<button class='details_button_search' id='" + nameId + "'>Dettagli</button>";
                 row2.appendChild(codeCol);
                 row2.appendChild(nameCol);
                 row2.appendChild(priceCol);
@@ -302,6 +302,7 @@
             addProductsInputNumArt.name = 'numProducts';
             addProductsInputNumArt.required;
             addProductsSubmitInput.value = 'Inserisci nel carrello';
+            addProductsSubmitInput.id = 'submitQuantityButton'
             addProductsInputNumArt.id = 'submitQuantity';
 
             addProductsForm.appendChild(addProductsInputNumArt);
@@ -471,6 +472,7 @@
             let orderButtonCol = document.createElement('td');
             let orderButton = document.createElement('button');
             orderButton.textContent = 'Ordina tutti i prodotti di questo fornitore!';
+            orderButton.id = 'orderButton';
             orderButtonCol.appendChild(orderButton);
 
             orderButton.addEventListener('click', function() {

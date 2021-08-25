@@ -1,11 +1,10 @@
 .column {
-    float: left;
     width: 45%;
     padding-bottom: 10px;
     background-color: #EDF2F5;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 20px;
-    margin: 22px;
+    margin: auto;
 }
 
 .insertShipmentPolicy {
@@ -203,6 +202,63 @@ footer {
     text-align: center;
 }
 
+#loginButton {
+    background-color: white;
+    border: 2px solid midnightblue;
+    color: midnightblue;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+#loginButton:hover {
+    color: white;
+    background-color: midnightblue;
+}
+
+.details_button_search {
+    background-color: white;
+    border: 2px solid dimgrey;
+    color: dimgrey;
+    padding: 4px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.details_button_search:hover {
+    color: white;
+    background-color: dimgrey;
+}
+
+#submitQuantityButton {
+    background-color: white;
+    border: 2px solid dimgrey;
+    color: dimgrey;
+    padding: 4px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+#submitQuantityButton:hover {
+    color: white;
+    background-color: dimgrey;
+}
+
 .saleMessage {
     color: darkred;
     animation: blink-animation 1s steps(5, start) infinite;
@@ -244,6 +300,43 @@ a:hover {
 .login_body {
     position: relative;
     overflow: hidden;
+}
+
+input[type=text], input[type=password] {
+    border: none;
+    border-bottom: 2px solid midnightblue;
+    width: 70%;
+    -webkit-transition: 0.5s;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+    border: none;
+    border-bottom: 5px solid lawngreen;
+    -webkit-transition: 0.3s;
+    outline: none;
+}
+
+#submitQuantity {
+    border: none;
+    width: 90%;
+    -webkit-transition: 0.5s;
+    padding: 6px 6px;
+    margin: 2px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    text-align: center;
+    font-size: 16px;
+}
+
+#submitQuantity:focus {
+    border: none;
+    border-bottom: 4px solid lawngreen;
+    -webkit-transition: 0.3s;
+    outline: none;
 }
 
 .collapsible {
