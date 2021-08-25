@@ -44,8 +44,8 @@
         cartCollapse(false, shipmentPolicies);
     });
 
-    let ordersButton = document.getElementById('orderButton');
-    ordersButton.addEventListener('click', function () {
+    let ordersButtonNav = document.getElementById('orderButtonNav');
+    ordersButtonNav.addEventListener('click', function () {
         orderCollapse(true);
     })
 
@@ -173,12 +173,14 @@
 
                 makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null,
                     function (request) {
-                        switch (request.status) {
-                            case 200:
-                                let lists = JSON.parse(request.responseText);
-                                let suppliers = lists[0];
-                                shipmentPolicies = lists[1];
-                                printProductDetails (suppliers, product, shipmentPolicies);
+                        if (request.readyState === XMLHttpRequest.DONE) {
+                            switch (request.status) {
+                                case 200:
+                                    let lists = JSON.parse(request.responseText);
+                                    let suppliers = lists[0];
+                                    shipmentPolicies = lists[1];
+                                    printProductDetails(suppliers, product, shipmentPolicies);
+                            }
                         }
                     });
             })
@@ -386,6 +388,8 @@
 
     function printCart(contentCart, shipmentPolicies) {
 
+        shipmentPolicies = getShipmentPolicies();
+
         if (document.getElementById('containerCartContent') != null)
             document.getElementById('containerCartContent').remove();
         let containerCartContent = document.createElement('div');
@@ -402,6 +406,8 @@
         for (let y = 0; y < cart.length; y++) {
             let totalCost = 0;
             let totalQuantity = 0;
+
+            let supplierCode = cart[y].supplier.code;
 
             let supplierName = document.createElement('h3');
             supplierName.textContent = cart[y].supplier.name;
@@ -464,7 +470,7 @@
             totalCol.textContent = 'Totale';
             let totalShipCostCol = document.createElement('td');
             let totalShipCost = 0;
-            totalShipCost = getShipmentCost(cart[y].supplier.code, shipmentPolicies, totalCost, totalQuantity);
+            totalShipCost = getShipmentCost(cart[y].supplier.code, totalCost, totalQuantity);
             totalShipCostCol.textContent = totalShipCost.toString() +  ".00 \u20ac";
             let totalCostCol = document.createElement('td');
             let totalVar = totalShipCost + totalCost;
@@ -476,7 +482,7 @@
             orderButtonCol.appendChild(orderButton);
 
             orderButton.addEventListener('click', function() {
-                startOrder();
+                startOrder(supplierCode);
             })
 
 
@@ -536,7 +542,7 @@
 
     }
 
-    function getShipmentCost(supplierCode, shipmentPolicies, totalCost, totalQuantity) {
+    function getShipmentCost(supplierCode, totalCost, totalQuantity) {
         let cost = 0;
         for (let i = 0; i < shipmentPolicies.length; i++) {
             if (shipmentPolicies[i].supplier === supplierCode) {
@@ -549,16 +555,39 @@
         return cost;
     }
 
-    function startOrder() {
+    function startOrder(supplierCode) {
+        let stringOrder;
+        for (let i = 0; i < cart.length; i++) {
+            if (cart[i].supplier.code === supplierCode) {
+                stringOrder = JSON.stringify(cart[i]);
+                sentOrder(stringOrder);
+                cart.splice(i, 1);
+            }
+        }
+    }
 
+    function sentOrder(order) {
+        sendJSON('Orders', order, function (request) {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                switch (request.status) {
+                    case 200:
+                        getOrders();
+                        cartCollapse(true, shipmentPolicies);
+                        break;
+                    default:
+                        let message = document.getElementById("errorMessagePage");
+                        message.textContent = request.responseText;
+                        window.location.replace("errorPage.html");
+                }
+            }
+        })
     }
 
     function getOrders() {
-        makeCall('GET', 'getOrders', null, function (request) {
+        makeCall('GET', 'Orders', null, function (request) {
             switch (request.status) {
                 case 200:
                     orders = JSON.parse(request.responseText);
-                    //printProductDetails (suppliers, product, shipmentPolicies);
             }
         })
     }
@@ -657,6 +686,20 @@
 
         }
         contentOrders.appendChild(containerOrderContent);
+    }
+
+    function getShipmentPolicies() {
+        makeCall('GET', 'getShipmentPolicies', null, function (request) {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                switch (request.status) {
+                    case 200:
+                        shipmentPolicies = JSON.parse(request.responseText);
+                        return shipmentPolicies;
+                    default:
+                        window.location.replace("errorPage.html");
+                }
+            }
+        })
     }
 
 }) ();

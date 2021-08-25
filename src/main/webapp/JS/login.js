@@ -1,15 +1,15 @@
 (function() {
 
     document.getElementById("loginButton").addEventListener('click', (e) => {
-        var form = e.target.closest("form");
+        let form = e.target.closest("form");
         if (form.checkValidity()) {
             makeCall("POST", 'Login', form,
                 function(request) {
-                    if (request.readyState == XMLHttpRequest.DONE) {
-                        var message = request.responseText;
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        let message = request.responseText;
                         switch (request.status) {
                             case 200:
-                                var userData = JSON.parse(request.responseText);
+                                let userData = JSON.parse(request.responseText);
                                 sessionStorage.setItem('username', userData.name);
                                 sessionStorage.setItem('sex', userData.sex);
                                 sessionStorage.setItem('email', userData.email);

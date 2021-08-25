@@ -1,10 +1,8 @@
 package com.polimi.it.tiw_ria.Controllers;
 
 import com.google.gson.Gson;
-import com.polimi.it.tiw_ria.Beans.Order;
 import com.polimi.it.tiw_ria.Beans.ShipmentPolicy;
 import com.polimi.it.tiw_ria.Beans.Supplier;
-import com.polimi.it.tiw_ria.DAO.OrderDAO;
 import com.polimi.it.tiw_ria.DAO.ShipmentPolicyDAO;
 import com.polimi.it.tiw_ria.DAO.SupplierDAO;
 
@@ -17,12 +15,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "getOrders", value = "/getOrders")
-public class getOrders extends HttpServlet {
+@WebServlet(name = "getShipmentPolicies", value = "/getShipmentPolicies")
+public class getShipmentPolicies extends HttpServlet {
 
     private Connection connection;
 
-    public getOrders() {super();}
+    public getShipmentPolicies() {super();}
 
     @Override
     public void init() throws ServletException {
@@ -43,7 +41,6 @@ public class getOrders extends HttpServlet {
         }
 
     }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -51,32 +48,16 @@ public class getOrders extends HttpServlet {
 
         if (strLogin != null) {
 
-            OrderDAO orderDAO = new OrderDAO(connection);
+            ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
             try {
-                List<Order> orders = orderDAO.getOrders(strLogin);
+                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyListComplete();
 
-                StringBuilder toSendBuilder = new StringBuilder("[");
-                String tempString;
-
-                Gson gson = new Gson();
-
-                for (Order order : orders) {
-                    tempString = gson.toJson(order);
-                    toSendBuilder.append(tempString);
-                    toSendBuilder.append(",");
-                }
-
-                toSendBuilder.delete(toSendBuilder.length() - 1, toSendBuilder.length());
-                toSendBuilder.append("]");
-
-                tempString = toSendBuilder.toString();
-
-                System.out.println(tempString);
+                String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
-                response.getWriter().println(tempString);
+                response.getWriter().println(shipmentPoliciesString);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -90,5 +71,16 @@ public class getOrders extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            if (connection != null){
+                connection.close();
+            }
+        } catch (SQLException ignored) {
+
+        }
     }
 }

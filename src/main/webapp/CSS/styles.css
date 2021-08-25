@@ -240,7 +240,7 @@ footer {
     background-color: dimgrey;
 }
 
-#submitQuantityButton {
+#submitQuantityButton, #orderButton {
     background-color: white;
     border: 2px solid dimgrey;
     color: dimgrey;
@@ -256,6 +256,11 @@ footer {
 
 #submitQuantityButton:hover {
     color: white;
+    background-color: dimgrey;
+}
+
+#orderButton:hover {
+    color: #FFFF33;
     background-color: dimgrey;
 }
 

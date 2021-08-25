@@ -3,7 +3,6 @@ package com.polimi.it.tiw_ria.Controllers;
 import com.google.gson.Gson;
 import com.polimi.it.tiw_ria.Beans.ShipmentPolicy;
 import com.polimi.it.tiw_ria.Beans.Supplier;
-import com.polimi.it.tiw_ria.DAO.ProductDAO;
 import com.polimi.it.tiw_ria.DAO.ShipmentPolicyDAO;
 import com.polimi.it.tiw_ria.DAO.SupplierDAO;
 
@@ -59,7 +58,7 @@ public class getInfoProduct extends HttpServlet {
             ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
             try {
                 List<Supplier> suppliers = supplierDAO.getInfoSuppliersShipment(codeProduct);
-                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyListComplete();
+                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPoliciesProduct(codeProduct);
 
                 String suppliersString = new Gson().toJson(suppliers);
                 String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
@@ -82,5 +81,16 @@ public class getInfoProduct extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            if (connection != null){
+                connection.close();
+            }
+        } catch (SQLException ignored) {
+
+        }
     }
 }

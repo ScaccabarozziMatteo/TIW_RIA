@@ -69,4 +69,15 @@ public class SearchProduct extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
     }
+
+    @Override
+    public void destroy() {
+        try {
+            if (connection != null){
+                connection.close();
+            }
+        } catch (SQLException ignored) {
+
+        }
+    }
 }
