@@ -276,6 +276,8 @@
 
         for (let x = 0; x < suppliers.length; x++) {
 
+            let supplierCode = suppliers[x].code;
+
             let row2 = document.createElement('tr');
             let nameCol = document.createElement('td');
             let evaluationCol = document.createElement('td');
@@ -288,6 +290,7 @@
             let addProductsForm = document.createElement('form');
             let addProductsInputNumArt = document.createElement('input');
             let addProductsSubmitInput = document.createElement('input');
+            let numProdCart = document.createElement('td');
 
 
 
@@ -325,6 +328,8 @@
             addProductsSubmitInput.id = 'submitQuantityButton'
             addProductsInputNumArt.id = 'submitQuantity';
 
+            numProdCart.textContent = getNumProductInCart(product, supplierCode);
+
             addProductsForm.appendChild(addProductsInputNumArt);
             addProductsForm.appendChild(addProductsSubmitInput);
             addProductsCartCol.appendChild(addProductsForm);
@@ -333,7 +338,7 @@
             row2.appendChild(evaluationCol);
             row2.appendChild(priceCol);
             row2.appendChild(shipmentPoliciesCol);
-            row2.appendChild(document.createElement('td'));
+            row2.appendChild(numProdCart);
             row2.appendChild(addProductsCartCol);
             tableBody.appendChild(row2);
 
@@ -387,6 +392,7 @@
                 for (let x = 0; x < numProd; x++) {
                     if (cart[i].products[x].product.code === prod.code) {
                         cart[i].products[x].product.quantity = Number.parseInt(cart[i].products[x].product.quantity) + Number.parseInt(quantity);
+                        cart[i].quantity += Number(quantity);
                         added = true;
                     }
                 }
@@ -396,6 +402,7 @@
                     products.product = prod;
                     products.product.quantity = quantity;
                     cart[i].products.push(products);
+                    cart[i].quantity += Number(quantity);
                     return;
                 }
             }
@@ -404,6 +411,7 @@
         products.product = prod;
         products.product.quantity = quantity;
         order.products.push(products);
+        order.quantity = Number(quantity);
         cart.push(order);
     }
 
@@ -736,6 +744,16 @@
                 }
             }
         })
+    }
+
+    function getNumProductInCart(product, supplier) {
+
+        for (let a = 0; a < cart.length; a++) {
+            if (cart[a].supplier.code === supplier) {
+                return cart[a].quantity;
+            }
+        }
+        return 0;
     }
 
     function homeAction() {
