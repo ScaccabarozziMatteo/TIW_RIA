@@ -15,26 +15,34 @@
     <ul>
         <li><a href="#" id="homeButton">Home</a></li>
         <li><a class="cartButton" href="#cartCollapsible" id="cartButton" onclick="">Carrello</a></li>
-        <li><a class="ordersButton" href="#" id="orderButton">Ordini</a></li>
+        <li><a class="ordersButton" href="#ordersCollapsible" id="orderButton">Ordini</a></li>
         <li id="logoutButton" style="cursor: pointer"><a class="logoutButton">Esci</a></li>
     </ul>
+
     <form action="#">
         <input type="search" id="searchBar" class="searchBar" name="search" placeholder="Cerca un prodotto..">
 
-        <div id = "detailsPopupContainer"></div>
+        <div id="detailsPopupContainer"></div>
 
     </form>
 </nav>
 
-<h1 id="welcome"></h1>
 
-<div id="searchedProducts"></div>
+<div id="mainBody">
+    <h1 id="welcome"></h1>
 
-<button id="cartCollapsible" class="collapsible">Carrello</button>
-<div id="contentCart" class="contentCollapsible"></div>
-<br>
-<button id="ordersCollapsible" class="collapsible">Ordini</button>
-<div id="contentOrders" class="contentCollapsible"></div>
-<footer>&copy; Diritti riservati</footer>
+    <table id="tableAdvice">
+        <tr id="trAdvice"></tr>
+    </table>
+
+    <div id="searchedProducts"></div>
+
+    <button id="cartCollapsible" class="collapsible">Carrello</button>
+    <div id="contentCart" class="contentCollapsible"></div>
+    <br>
+    <button id="ordersCollapsible" class="collapsible">Ordini</button>
+    <div id="contentOrders" class="contentCollapsible"></div>
+    <footer>&copy; Diritti riservati</footer>
+</div>
 </body>
 </html>

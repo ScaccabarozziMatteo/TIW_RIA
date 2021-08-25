@@ -1,5 +1,3 @@
-var cart = [];
-
 (function () {
 
     var name = sessionStorage.getItem('username');
@@ -9,6 +7,7 @@ var cart = [];
     const searchBar = document.getElementById("searchBar");
     var shipmentPolicies;
     var orders = [];
+    var cart = [];
 
 
     if (name != null) {
@@ -34,7 +33,7 @@ var cart = [];
 
     let buttonCart = document.getElementById('cartButton');
     buttonCart.addEventListener('click', function () {
-        cartCollapse(false, shipmentPolicies);
+        cartCollapse(true, shipmentPolicies);
     })
 
     getOrders();
@@ -43,6 +42,17 @@ var cart = [];
 
     cartColl.addEventListener("click", function () {
         cartCollapse(false, shipmentPolicies);
+    });
+
+    let ordersButton = document.getElementById('orderButton');
+    ordersButton.addEventListener('click', function () {
+        orderCollapse(true);
+    })
+
+    let ordersColl = document.getElementById("ordersCollapsible");
+
+    ordersColl.addEventListener("click", function () {
+        orderCollapse(false);
     });
 
 
@@ -477,6 +487,7 @@ var cart = [];
 
             table.appendChild(tableBody);
             containerCartContent.appendChild(table);
+            containerCartContent.appendChild(document.createElement('br'));
 
         }
         contentCart.appendChild(containerCartContent);
@@ -498,6 +509,26 @@ var cart = [];
                 document.getElementById("cartMessage").remove();
         } else {
             printCart(contentCart, shipmentPolicies);
+            content.style.maxHeight = content.scrollHeight + "px";
+        }
+
+    }
+
+    function orderCollapse(collapse) {
+        let orderColl = document.getElementById("ordersCollapsible");
+
+        orderColl.classList.toggle("active");
+        let content = orderColl.nextElementSibling;
+        if (collapse)
+            content.style.maxHeight = null;
+
+
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            if (document.getElementById("ordersMessage") !== null)
+                document.getElementById("ordersMessage").remove();
+        } else {
+            printOrders();
             content.style.maxHeight = content.scrollHeight + "px";
         }
 
@@ -528,6 +559,102 @@ var cart = [];
                     //printProductDetails (suppliers, product, shipmentPolicies);
             }
         })
+    }
+
+    function printOrders() {
+
+        if (document.getElementById('containerOrderContent') != null)
+            document.getElementById('containerOrderContent').remove();
+        let containerOrderContent = document.createElement('div');
+        let contentOrders = document.getElementById('contentOrders');
+        containerOrderContent.id = 'containerOrderContent';
+
+
+        if (orders.length === 0) {
+            let message = document.createElement('h3');
+            message.textContent = 'Nessun ordine presente! :('
+            containerOrderContent.appendChild(message);
+            contentOrders.appendChild(containerOrderContent);
+            return;
+        }
+
+        for (let y = 0; y < orders.length; y++) {
+
+            let orderID = document.createElement('h3');
+            orderID.textContent = '#Ordine:' + orders[y].numOrder + ' - '+ orders[y].supplierName;
+            containerOrderContent.appendChild(orderID);
+
+            let table = document.createElement('table');
+            let tableBody = document.createElement('tbody');
+            let row1 = document.createElement('tr');
+
+            let thName = document.createElement('th');
+            thName.textContent = 'Nome prodotto';
+            row1.appendChild(thName);
+            let thQuantity = document.createElement('th');
+            thQuantity.textContent = 'Quantità';
+            row1.appendChild(thQuantity);
+            let thCostShipment = document.createElement('th');
+            thCostShipment.textContent = 'Costo Spedizione';
+            row1.appendChild(thCostShipment);
+            let thTotal = document.createElement('th');
+            thTotal.textContent = 'Totale';
+            row1.appendChild(thTotal);
+            let thPhoto = document.createElement('th');
+            thPhoto.textContent = 'Foto';
+            row1.appendChild(thPhoto);
+
+            table.appendChild(row1);
+
+            for (let a = 0; a < orders[y].products.length; a++) {
+                let product = orders[y].products[a];
+                let row2 = document.createElement('tr');
+
+                let nameProduct = document.createElement('td');
+                nameProduct.textContent = product.name;
+                let numProducts = document.createElement('td');
+                numProducts.textContent = product.quantity;
+                let totalProd = document.createElement('td');
+                let total = parseFloat(product.price) * parseInt(product.quantity);
+                totalProd.textContent = total.toString() + ".00 \u20ac";
+                row2.appendChild(nameProduct);
+                row2.appendChild(numProducts);
+
+
+                let photoTd = document.createElement('td');
+                let photoImg = document.createElement('img');
+                photoImg.src = "upload/" + product.image;
+                photoImg.height = 100;
+                photoImg.alt = "imageProduct";
+
+                photoTd.appendChild(photoImg);
+                row2.appendChild(photoTd);
+                row2.appendChild(document.createElement('td'));
+                row2.appendChild(totalProd);
+                tableBody.appendChild(row2);
+            }
+            let lastRow = document.createElement('tr');
+            let totalCol = document.createElement('td');
+            totalCol.textContent = 'Totale';
+            let totalShipCostCol = document.createElement('td');
+            totalShipCostCol.textContent = orders[y].shipmentFees +  ".00 \u20ac";
+            let totalCostCol = document.createElement('td');
+            totalCostCol.textContent = orders[y].total +  ".00 \u20ac";
+
+
+            lastRow.appendChild(totalCol);
+            lastRow.appendChild(document.createElement('td'));
+            lastRow.appendChild(document.createElement('td'));
+            lastRow.appendChild(totalShipCostCol);
+            lastRow.appendChild(totalCostCol);
+            tableBody.appendChild(lastRow);
+
+            table.appendChild(tableBody);
+            containerOrderContent.appendChild(table);
+            containerOrderContent.appendChild(document.createElement('br'));
+
+        }
+        contentOrders.appendChild(containerOrderContent);
     }
 
 }) ();

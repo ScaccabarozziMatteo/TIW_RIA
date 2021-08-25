@@ -91,12 +91,17 @@
     height: 70px;
 }
 
+#mainBody {
+    padding-top: 70px;
+}
+
 .navigation-bar {
     background-color: #EDF2F5;
     height: 70px;
     width: 100%;
     text-align:left;
     border-radius: 20px;
+    position: fixed;
 }
 .navigation-bar img{
     float:left;
@@ -242,7 +247,7 @@ a:hover {
 }
 
 .collapsible {
-    background-color: #555;
+    background-color: midnightblue;
     color: white;
     cursor: pointer;
     padding: 18px;
@@ -251,14 +256,16 @@ a:hover {
     text-align: center;
     outline: none;
     font-size: 20px;
+    scroll-margin-top: 4em;
 }
 
-.active, .collapsible:hover {
-    background-color: #777;
+.collapsible:hover {
+    background-color: white;
+    color: midnightblue;
 }
 
 .active:after {
-    content: "\2212";
+    content: '\2212';
 }
 
 .collapsible:after {
@@ -274,6 +281,7 @@ a:hover {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
+    background-color: rgba(232, 236, 241, 0.5);
 }
 
 #searchedProducts {
