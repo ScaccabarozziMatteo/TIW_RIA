@@ -100,8 +100,10 @@
                                 case 200:
                                     productsSearched = JSON.parse(request.responseText);
                                     printProductSearched(productsSearched, searchBar);
+
                                     window.location.href = "#searchedProducts";
-                                    document.getElementById('searchBar').focus();
+                                    document.getElementById('searchBar').focus({preventScroll: true});
+
                                     break;
                                 default:
                                     sessionStorage.clear();
