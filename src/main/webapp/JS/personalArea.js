@@ -82,7 +82,7 @@
         orderCollapse();
     });
 
-    searchBar.addEventListener("keyup", e => function searchBarAction () {
+    searchBar.addEventListener("keyup", e => {
 
         let el = document.getElementById("searchBar");
         el.addEventListener("keypress", function (event) {
@@ -360,7 +360,7 @@
                 let offsetEL = window.document.getElementById('detailsPopup');
 
                 document.getElementById('divPopup' + supplierCode + product.code).style.left = Number(e.clientX - offsetEL.offsetLeft - 200) + 'px';
-                document.getElementById('divPopup' + supplierCode + product.code).style.top = Number(e.clientY - offsetEL.offsetTop) + 'px';
+                document.getElementById('divPopup' + supplierCode + product.code).style.top = Number(e.clientY - offsetEL.offsetTop - 200) + 'px';
                 document.getElementById('divPopup' + supplierCode + product.code).style.display = 'block';
             });
 
@@ -979,11 +979,12 @@
             titlePopup.textContent = numProdInCart + ' articoli presenti:';
 
             divPopup.appendChild(titlePopup);
-            divPopup.style.background = 'green';
+            divPopup.style.background = 'lawngreen';
 
             for (let a = 0; a < elementCart.products.length; a++) {
                 let spanText = document.createElement('p');
-                spanText.textContent = '- ' + elementCart.products[a].product.quantity + 'x ' + elementCart.products[a].product.name;
+                spanText.textContent = elementCart.products[a].product.quantity + 'x ' + elementCart.products[a].product.name;
+                spanText.style.textAlign = 'left';
                 divPopup.appendChild(spanText);
             }
 
