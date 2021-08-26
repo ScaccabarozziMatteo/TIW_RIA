@@ -291,7 +291,7 @@
         thShipmentPolicies.textContent = "Politiche di spedizione";
         thShipmentPolicies.style.width = '30%';
         row.appendChild(thShipmentPolicies);
-        thNumProdCart.textContent = "#prodotti del fornitore nel carrello";
+        thNumProdCart.textContent = "# prodotti del fornitore nel carrello";
         row.appendChild(thNumProdCart);
         quantity.textContent = 'Quantità';
         row.appendChild(quantity);
