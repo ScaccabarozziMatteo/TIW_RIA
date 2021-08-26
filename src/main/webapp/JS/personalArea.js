@@ -11,25 +11,29 @@
     var shipmentPolicies;
     var orders = [];
     var cart = [];
-    var fiveProducts;
-    var viewedElements = [];
 
-
-    if (name != null) {
-        switch (sex) {
-            case 'male':
-                welcomeDiv.textContent = "Benvenuto " + name;
-                break;
-            case 'female':
-                welcomeDiv.textContent = "Benvenuta " + name;
-                break;
-            case null:
-                welcomeDiv.textContent = "Benvenut* " + name;
-                break;
-        }
-    }
-    else
+    if (name == null)
         window.location.replace("index.html");
+
+    var fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
+    var viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
+
+    if (viewedElements == null)
+        viewedElements = [];
+
+
+    switch (sex) {
+        case 'male':
+            welcomeDiv.textContent = "Benvenuto " + name;
+            break;
+        case 'female':
+            welcomeDiv.textContent = "Benvenuta " + name;
+            break;
+        case null:
+            welcomeDiv.textContent = "Benvenut* " + name;
+            break;
+    }
+
 
     get5products();
 
@@ -561,7 +565,7 @@
         setTimeout(() => {
             if (anchor)
                 window.location.href = "#cartCollapsible";
-            }, 300);
+            }, 200);
 
     }
 
@@ -588,7 +592,7 @@
         setTimeout(() => {
             if (anchor)
                 window.location.href = "#ordersCollapsible";
-        }, 300);
+        }, 200);
 
     }
 
@@ -774,17 +778,24 @@
         document.getElementById('searchedProducts').style.display = 'none';
         cartCollapse(-1, shipmentPolicies);
         orderCollapse(-1);
+        searchBar.value = '';
 
     }
 
     function get5products() {
 
-        if (fiveProducts != null && fiveProducts.length !== 0) {
+        if (sessionStorage.getItem('fiveProducts') != null) {
+            fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'))
+            printADVprod();
+        }
+
+        if (fiveProducts == null) {
             makeCall('GET', 'get5products', null, function (request) {
                 if (request.readyState === XMLHttpRequest.DONE) {
                     switch (request.status) {
                         case 200:
                             fiveProducts = JSON.parse(request.responseText);
+                            sessionStorage.setItem('fiveProducts', JSON.stringify(fiveProducts));
                             printADVprod()
                             break;
                         default:
@@ -808,6 +819,7 @@
         advTitle.textContent = 'Ecco un pò di consigli scelti apposta per te:';
         divID.appendChild(advTitle);
         let advTable = document.createElement('table');
+        advTable.id = 'advTable';
         let advTableBody = document.createElement('tbody');
         let advRow = document.createElement('tr');
         advRow.style.backgroundColor = 'white';
@@ -824,7 +836,7 @@
             let advP1 = document.createElement('p');
             let advP2 = document.createElement('p');
 
-            if (viewedElements.length < vw) {
+            if (viewedElements.length > vw) {
                 advImg.src = "upload/" + viewedElements[vw].image;
                 advImg.height = 200;
                 advImg.alt = "imageProduct";
@@ -881,6 +893,23 @@
 
         if (viewedElements.length > 5)
             viewedElements.pop();
+
+        eliminateFrom5products(product.code);
+
+        sessionStorage.setItem('viewedElements', JSON.stringify(viewedElements));
+
+    }
+
+    function eliminateFrom5products(codeProd) {
+        for (let i = 0; i < fiveProducts.length; i++) {
+            if (fiveProducts[i].code === codeProd) {
+                fiveProducts.splice(i, 1);
+            }
+        }
+
+        printADVprod();
+
+        sessionStorage.setItem('fiveProducts', JSON.stringify(fiveProducts));
     }
 
 }) ();
