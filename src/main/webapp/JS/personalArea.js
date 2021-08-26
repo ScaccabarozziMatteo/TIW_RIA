@@ -11,8 +11,10 @@
 
     let orders = [];
 
-    if (name == null)
+    if (name == null) {
+        sessionStorage.clear();
         window.location.replace("index.html");
+    }
 
     let fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
     let viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
@@ -25,8 +27,10 @@
     if (cart == null)
         cart = [];
 
-    if(document.getElementById("welcome") == null)
+    if(document.getElementById("welcome") == null) {
+        sessionStorage.clear();
         window.location.replace('index.html');
+    }
     else
         welcomeDiv = document.getElementById("welcome");
 
@@ -100,6 +104,7 @@
                                     document.getElementById('searchBar').focus();
                                     break;
                                 default:
+                                    sessionStorage.clear();
                                     window.location.replace("errorPage.html");
                             }
                         }
@@ -209,6 +214,7 @@
                                     printProductDetails(suppliers, product, shipmentPolicies);
                                     break;
                                 default:
+                                    sessionStorage.clear();
                                     window.location.replace("errorPage.html");
                             }
                         }
@@ -344,8 +350,23 @@
             addProductsSubmitInput.id = 'submitQuantityButton'
             addProductsInputNumArt.id = 'submitQuantity';
 
-            numProdCart.textContent = getNumProductInCart(product, supplierCode);
+            let numProdInCart = getNumProductInCart(product, supplierCode);
+            numProdCart.textContent = numProdInCart;
             numProdCart.style.cursor = 'pointer';
+
+            createPopup(numProdInCart, supplierCode, numProdCart, product.code);
+
+            numProdCart.addEventListener('mousemove', function (e) {
+                let offsetEL = window.document.getElementById('detailsPopup');
+
+                document.getElementById('divPopup' + supplierCode + product.code).style.left = Number(e.clientX - offsetEL.offsetLeft - 200) + 'px';
+                document.getElementById('divPopup' + supplierCode + product.code).style.top = Number(e.clientY - offsetEL.offsetTop) + 'px';
+                document.getElementById('divPopup' + supplierCode + product.code).style.display = 'block';
+            });
+
+            numProdCart.addEventListener('mouseout', function () {
+                document.getElementById('divPopup' + supplierCode + product.code).style.display = 'none';
+            });
 
             addProductsForm.appendChild(addProductsInputNumArt);
             addProductsForm.appendChild(addProductsSubmitInput);
@@ -644,6 +665,7 @@
                         break;
                     default:
                         alert(message);
+                        sessionStorage.clear();
                         window.location.replace("errorPage.html");
                 }
             }
@@ -658,6 +680,7 @@
                         orders = JSON.parse(request.responseText);
                         break;
                     default:
+                        sessionStorage.clear();
                         window.location.replace("errorPage.html");
                 }
             }
@@ -771,6 +794,7 @@
                         sessionStorage.setItem('shipmentPolicies', JSON.stringify(shipmentPolicies));
                         return shipmentPolicies;
                     default:
+                        sessionStorage.clear();
                         window.location.replace("errorPage.html");
                 }
             }
@@ -812,6 +836,7 @@
                             printADVprod()
                             break;
                         default:
+                            sessionStorage.clear();
                             window.location.replace("errorPage.html");
                     }
                 }
@@ -923,6 +948,43 @@
         printADVprod();
 
         sessionStorage.setItem('fiveProducts', JSON.stringify(fiveProducts));
+    }
+
+    function createPopup(numProdInCart, supplierCode, numProdCart, prodCode) {
+
+        if (document.getElementById('divPopup' + supplierCode + prodCode) != null)
+            document.getElementById('divPopup' + supplierCode + prodCode).remove();
+
+        let divPopup = document.createElement('div');
+        divPopup.id = 'divPopup' + supplierCode + prodCode;
+        divPopup.className = 'divPopup'
+
+        if (numProdInCart === 0) {
+            let spanText = document.createElement('p');
+            spanText.className = 'spanPopup';
+            spanText.textContent = 'Non ci sono prodotti di questo fornitore nel carrello!'
+            divPopup.appendChild(spanText);
+        }
+        else {
+
+            let elementCart;
+
+            for (let i = 0; i < cart.length; i++)
+                if (cart[i].supplier.code === supplierCode) {
+                    elementCart = cart[i];
+                    break;
+                }
+
+            for (let a = 0; a < elementCart.length; a++) {
+
+            }
+
+
+
+
+        }
+        numProdCart.appendChild(divPopup);
+
     }
 
 }) ();
