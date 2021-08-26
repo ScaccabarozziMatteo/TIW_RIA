@@ -960,12 +960,12 @@
         divPopup.className = 'divPopup'
 
         if (numProdInCart === 0) {
-            let spanText = document.createElement('p');
-            spanText.className = 'spanPopup';
-            spanText.textContent = 'Non ci sono prodotti di questo fornitore nel carrello!'
-            divPopup.appendChild(spanText);
-        }
-        else {
+            let titleH4 = document.createElement('h4');
+            titleH4.className = 'spanPopup';
+            titleH4.textContent = 'Non ci sono prodotti di questo fornitore nel carrello!'
+            divPopup.appendChild(titleH4);
+            divPopup.style.background = 'yellow';
+        } else {
 
             let elementCart;
 
@@ -975,12 +975,17 @@
                     break;
                 }
 
-            for (let a = 0; a < elementCart.length; a++) {
+            let titlePopup = document.createElement('h4');
+            titlePopup.textContent = numProdInCart + ' articoli presenti:';
 
+            divPopup.appendChild(titlePopup);
+            divPopup.style.background = 'green';
+
+            for (let a = 0; a < elementCart.products.length; a++) {
+                let spanText = document.createElement('p');
+                spanText.textContent = '- ' + elementCart.products[a].product.quantity + 'x ' + elementCart.products[a].product.name;
+                divPopup.appendChild(spanText);
             }
-
-
-
 
         }
         numProdCart.appendChild(divPopup);
