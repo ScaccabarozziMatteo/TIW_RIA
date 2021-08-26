@@ -369,6 +369,7 @@
 
         detailsPopupContainer.style.display = 'block';
 
+        addProdViewed(product);
 
     }
 
@@ -777,18 +778,21 @@
     }
 
     function get5products() {
-        makeCall('GET', 'get5products', null, function (request) {
-            if (request.readyState === XMLHttpRequest.DONE) {
-                switch (request.status) {
-                    case 200:
-                        fiveProducts = JSON.parse(request.responseText);
-                        printADVprod()
-                        break;
-                    default:
-                        window.location.replace("errorPage.html");
+
+        if (fiveProducts != null && fiveProducts.length !== 0) {
+            makeCall('GET', 'get5products', null, function (request) {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    switch (request.status) {
+                        case 200:
+                            fiveProducts = JSON.parse(request.responseText);
+                            printADVprod()
+                            break;
+                        default:
+                            window.location.replace("errorPage.html");
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
     function printADVprod() {
@@ -810,6 +814,9 @@
 
         let vw = 0;
         let five = 0;
+        let product = [];
+        let prod;
+
         for(let a = 0; a < 5; a++) {
             let advCol = document.createElement('td');
             let advDiv = document.createElement('div');
@@ -821,8 +828,13 @@
                 advImg.src = "upload/" + viewedElements[vw].image;
                 advImg.height = 200;
                 advImg.alt = "imageProduct";
+                advImg.style.cursor = 'pointer';
 
                 advP1.textContent = viewedElements[vw].name;
+                advP1.style.cursor = 'pointer';
+                advP1.className = 'ADVlink';
+                prod = viewedElements[vw];
+                product.push(prod);
                 advP2.textContent = 'Prodotto visto di recente'
                 advP2.className = 'viewedMessage';
                 vw++;
@@ -831,13 +843,19 @@
                 advImg.src = "upload/" + fiveProducts[five].image;
                 advImg.height = 200;
                 advImg.alt = "imageProduct";
+                advImg.style.cursor = 'pointer';
+                prod = fiveProducts[five];
+                product.push(prod);
 
                 advP1.textContent = fiveProducts[five].name;
+                advP1.style.cursor = 'pointer';
+                advP1.className = 'ADVlink';
                 advP2.textContent = 'Offerta speciale!'
                 advP2.className = 'saleMessage';
                 five++;
             }
 
+            advCol.id = 'ADV' + prod.code;
             advDiv.appendChild(advImg);
             advDiv.appendChild(advP1);
             advDiv.appendChild(advP2);
@@ -848,6 +866,21 @@
         advTableBody.appendChild(advRow);
         advTable.appendChild(advTableBody);
         divID.appendChild(advTable);
+
+        for (let a = 0; a < 5; a++) {
+            productDetails(product[a].code, 'ADV' + product[a].code, product[a]);
+        }
+    }
+
+    function addProdViewed(product) {
+        for (let i = 0; i < viewedElements.length; i++) {
+            if (viewedElements[i].code === product.code)
+                viewedElements.splice(i, 1);
+        }
+        viewedElements.unshift(product);
+
+        if (viewedElements.length > 5)
+            viewedElements.pop();
     }
 
 }) ();

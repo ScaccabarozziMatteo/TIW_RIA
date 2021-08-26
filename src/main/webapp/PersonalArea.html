@@ -17,14 +17,15 @@
         <li><a class="cartButton" href="#cartCollapsible" id="cartButton" onclick="">Carrello</a></li>
         <li><a class="ordersButton" href="#ordersCollapsible" id="orderButtonNav">Ordini</a></li>
         <li id="logoutButton" style="cursor: pointer"><a class="logoutButton">Esci</a></li>
+        <li style="float: right; width: 30%">
+            <form action="#">
+                <input type="search" id="searchBar" class="searchBar" name="search" placeholder="Cerca un prodotto..">
+
+                <div id="detailsPopupContainer"></div>
+
+            </form>
+        </li>
     </ul>
-
-    <form action="#">
-        <input type="search" id="searchBar" class="searchBar" name="search" placeholder="Cerca un prodotto..">
-
-        <div id="detailsPopupContainer"></div>
-
-    </form>
 </nav>
 
 
@@ -37,6 +38,8 @@
     <br>
 
     <div id="searchedProducts"></div>
+
+    <br>
 
     <button id="cartCollapsible" class="collapsible">Carrello</button>
     <div id="contentCart" class="contentCollapsible"></div>
