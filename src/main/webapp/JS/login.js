@@ -35,7 +35,7 @@
         }
     });
 
-    if (sessionStorage.getItem('username').length > 0) {
+    if (sessionStorage.getItem('username') != null) {
         window.location.replace("PersonalArea.html");
     }
 

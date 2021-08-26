@@ -1,25 +1,34 @@
 (function () {
 
 
-    var name = sessionStorage.getItem('username');
-    var sex = sessionStorage.getItem('sex');
-    let welcomeDiv = document.getElementById("welcome");
+    let name = sessionStorage.getItem('username');
+    let sex = sessionStorage.getItem('sex');
+    let welcomeDiv;
     let logout_button = document.getElementById("logoutButton");
     let searchBar = document.getElementById("searchBar");
     let homeButton = document.getElementById("homeButton");
+    let productsSearched;
 
-    var shipmentPolicies;
-    var orders = [];
-    var cart = [];
+    let orders = [];
 
     if (name == null)
         window.location.replace("index.html");
 
-    var fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
-    var viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
+    let fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
+    let viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
+    let cart = JSON.parse(sessionStorage.getItem('cart'));
+    let shipmentPolicies = JSON.parse(sessionStorage.getItem('shipmentPolicies'));
 
+    // Initialize cart and viewedElements if they don't exist
     if (viewedElements == null)
         viewedElements = [];
+    if (cart == null)
+        cart = [];
+
+    if(document.getElementById("welcome") == null)
+        window.location.replace('index.html');
+    else
+        welcomeDiv = document.getElementById("welcome");
 
 
     switch (sex) {
@@ -34,10 +43,9 @@
             break;
     }
 
-
     get5products();
 
-    logout_button.addEventListener("click", ev => {
+    logout_button.addEventListener("click", function () {
         sessionStorage.clear();
         window.location.replace("index.html");
     })
@@ -70,7 +78,7 @@
         orderCollapse();
     });
 
-    searchBar.addEventListener("keyup", e => {
+    searchBar.addEventListener("keyup", e => function searchBarAction () {
 
         let el = document.getElementById("searchBar");
         el.addEventListener("keypress", function (event) {
@@ -86,7 +94,7 @@
                         if (request.readyState === XMLHttpRequest.DONE) {
                             switch (request.status) {
                                 case 200:
-                                    var productsSearched = JSON.parse(request.responseText);
+                                    productsSearched = JSON.parse(request.responseText);
                                     printProductSearched(productsSearched, searchBar);
                                     window.location.href = "#searchedProducts";
                                     document.getElementById('searchBar').focus();
@@ -188,7 +196,7 @@
     function productDetails(codeProd, nameId, product) {
         const button = document.getElementById(nameId);
 
-        button.addEventListener("click",e => {
+        button.addEventListener("click",function () {
 
                 makeCall("GET" , 'getInfoProduct?code=' + codeProd ,null,
                     function (request) {
@@ -223,7 +231,7 @@
         close.style.fontSize = '30px';
         detailsPopup.appendChild(close);
 
-        close.addEventListener("click", ev => detailsPopupContainer.style.display = 'none');
+        close.addEventListener("click", function () { detailsPopupContainer.style.display = 'none'});
 
         let title = document.createElement('h3');
         title.textContent = product.name;
@@ -306,6 +314,7 @@
             evaluationCol.style.width = '5%';
             shipmentPoliciesCol.style.width = '30%';
             priceCol.textContent = suppliers[x].priceProd + ".00 \u20ac";
+            product.price = suppliers[x].priceProd; // Setta correttamente il prezzo
 
             shipmentPoliciesSummary.textContent = "Espandi";
             shipmentPoliciesDetails.appendChild(shipmentPoliciesSummary);
@@ -336,6 +345,7 @@
             addProductsInputNumArt.id = 'submitQuantity';
 
             numProdCart.textContent = getNumProductInCart(product, supplierCode);
+            numProdCart.style.cursor = 'pointer';
 
             addProductsForm.appendChild(addProductsInputNumArt);
             addProductsForm.appendChild(addProductsSubmitInput);
@@ -359,8 +369,8 @@
                     addProductsCart(supplier, product, addProductsInputNumArt.value);
                     detailsPopupContainer.style.display = 'none';
                     searchBar.value = '';
-                    printProductSearched();
-                    cartCollapse(true, shipmentPolicies);
+                    printProductSearched(productsSearched, searchBar);
+                    cartCollapse(true, shipmentPolicies, true);
                 }
             });
 
@@ -421,6 +431,8 @@
         order.products.push(products);
         order.quantity = Number(quantity);
         cart.push(order);
+
+        sessionStorage.setItem('cart', JSON.stringify(cart));
     }
 
     function printCart(contentCart, shipmentPolicies) {
@@ -546,7 +558,7 @@
         let contentCart = document.getElementById("contentCart");
 
         cartColl.classList.toggle("active");
-        var content = cartColl.nextElementSibling;
+        let content = cartColl.nextElementSibling;
         if (collapse)
             content.style.maxHeight = null;
 
@@ -756,6 +768,7 @@
                 switch (request.status) {
                     case 200:
                         shipmentPolicies = JSON.parse(request.responseText);
+                        sessionStorage.setItem('shipmentPolicies', JSON.stringify(shipmentPolicies));
                         return shipmentPolicies;
                     default:
                         window.location.replace("errorPage.html");
