@@ -48,18 +48,23 @@ public class getShipmentPolicies extends HttpServlet {
 
         if (strLogin != null) {
 
-            ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
-            try {
-                List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyListComplete();
+            String prodCode = request.getParameter("prodCode");
 
-                String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
+            if (!prodCode.isEmpty()) {
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().println(shipmentPoliciesString);
-            } catch (SQLException e) {
-                e.printStackTrace();
+                ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
+                try {
+                    List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyList(prodCode);
+
+                    String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().println(shipmentPoliciesString);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
         else {
