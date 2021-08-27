@@ -11,10 +11,12 @@
 
     let orders = [];
 
-    if (name == null) {
-        sessionStorage.clear();
-        window.location.replace("index.html");
-    }
+    window.addEventListener('load', function () {
+        if (name == null) {
+            sessionStorage.clear();
+            window.location.replace("index.html");
+        }
+    })
 
     let fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
     let viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
