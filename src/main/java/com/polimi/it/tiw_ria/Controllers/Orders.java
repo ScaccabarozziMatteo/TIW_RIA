@@ -6,6 +6,8 @@ import com.polimi.it.tiw_ria.Beans.Order;
 import com.polimi.it.tiw_ria.Beans.Product;
 import com.polimi.it.tiw_ria.DAO.OrderDAO;
 
+import com.polimi.it.tiw_ria.DAO.ProductDAO;
+import com.polimi.it.tiw_ria.DAO.ShipmentPolicyDAO;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,14 +101,16 @@ public class Orders extends HttpServlet {
         if (strLogin != null) {
 
             OrderDAO orderDAO = new OrderDAO(connection);
+            ProductDAO productDAO = new ProductDAO(connection);
+            ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
+
             Order order;
             List<Product> products = new ArrayList<>();
-            int quantity;
+            int quantity = 0;
             int codeProd;
-            float shipmentFees;
-            float totalCost;
-            float price;
-
+            float costProd;
+            float totalCost = 0;
+            int totalQuantity = 0;
             String supplierCode;
 
             String JSONString;
@@ -120,26 +124,23 @@ public class Orders extends HttpServlet {
 
             try {
                 supplierCode = JSONObj.getJSONObject("supplier").getString("code");
-                shipmentFees = JSONObj.getFloat("costShipment");
-                totalCost = JSONObj.getFloat("subtotal");
                 JSONArr = JSONObj.getJSONArray("products");
 
-                if (!supplierCode.isEmpty() && totalCost > 0 && shipmentFees > -1) {
+                if (!supplierCode.isEmpty()) {
                     order = new Order(supplierCode);
 
                     for (int i = 0; i < JSONArr.length(); i++) {
                         quantity = JSONArr.getJSONObject(i).getJSONObject("product").getInt("quantity");
                         codeProd = JSONArr.getJSONObject(i).getJSONObject("product").getInt("code");
-                        price = JSONArr.getJSONObject(i).getJSONObject("product").getFloat("price");
 
-                        if (quantity > 0 && codeProd > 0 && price > 0) {
+                        if (quantity > 0 && codeProd > 0) {
 
+                            totalQuantity += quantity;
                             Product product = new Product(codeProd, quantity);
-                            product.setPrice(price);
+                            costProd = productDAO.getCostProduct(codeProd, supplierCode);
+                            totalCost += costProd * quantity;
+                            product.setPrice(costProd);
                             products.add(product);
-
-
-
 
                         } else {
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -148,7 +149,8 @@ public class Orders extends HttpServlet {
                         }
                     }
 
-                    order.setShipmentFees(shipmentFees);
+
+                    order.setShipmentFees(shipmentPolicyDAO.getShipmentFeeCost(supplierCode, quantity, totalCost));
                     order.setTotal(totalCost);
                     order.setProducts(products);
 
@@ -159,12 +161,10 @@ public class Orders extends HttpServlet {
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().println("Parametri non validi!");
-                    return;
                 }
             } catch (JSONException | SQLException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().println("Parametri non validi!");
-                return;
             }
 
 

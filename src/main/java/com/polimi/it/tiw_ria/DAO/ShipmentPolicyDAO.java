@@ -36,25 +36,6 @@ public class ShipmentPolicyDAO {
         return shipmentPolicies;
     }
 
-    public List<ShipmentPolicy> shipmentPolicyListComplete() throws SQLException {
-        List<ShipmentPolicy> shipmentPolicies = new ArrayList<>();
-
-        String SQLQuery = "SELECT * FROM dbtest.shipment_policy ORDER BY min_articles";
-
-        try (PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                ShipmentPolicy shipmentPolicy = new ShipmentPolicy(resultSet.getInt("id"), resultSet.getInt("min_articles"), resultSet.getInt("max_articles"), resultSet.getString("supplier"), resultSet.getFloat("cost_shipment"), resultSet.getFloat("free_shipment"));
-                shipmentPolicies.add(shipmentPolicy);
-            }
-        }
-        if (shipmentPolicies.isEmpty())
-            return null;
-
-        return shipmentPolicies;
-    }
-
     public List<ShipmentPolicy> shipmentPoliciesProduct(int prodCode) throws SQLException {
         List<ShipmentPolicy> shipmentPolicies = new ArrayList<>();
 
@@ -136,6 +117,24 @@ public class ShipmentPolicyDAO {
             returnValue = resultSet.next();
         }
         return returnValue;
+    }
+
+    public float getShipmentFeeCost(String supplierCode, int quantity, float totalCost) throws SQLException{
+
+        float fees = 0;
+        List<ShipmentPolicy> policyList = shipmentPolicyList(supplierCode);
+
+        for (ShipmentPolicy shipPolicy: policyList) {
+            if (shipPolicy.getMin_articles() == 999999999 && shipPolicy.getFreeShipment() <= totalCost) {
+                fees = 0;
+                return fees;
+            }
+            else if (quantity >= shipPolicy.getMin_articles() && quantity <= shipPolicy.getMax_articles()) {
+                fees = shipPolicy.getCostShipment();
+            }
+        }
+
+        return fees;
     }
 
 

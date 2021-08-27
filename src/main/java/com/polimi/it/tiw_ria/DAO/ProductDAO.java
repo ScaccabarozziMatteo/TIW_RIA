@@ -140,26 +140,21 @@ public class ProductDAO {
         return returnValue;
     }
 
-    public void createProduct(int code, String name, String description, String category, String photoPath, String supplier, float price) throws SQLException {
-        String query = "INSERT into dbtest.products (code, name, description, category, photo) VALUES(?, ?, ?, ?, ?)";
-        String query2 = "INSERT into dbtest.supplier_catalogue (product, supplier, price) VALUES (?, ?, ?)";
+    public float getCostProduct(int prodCode, String supplierCode) throws SQLException {
+        String query = "SELECT price FROM supplier_catalogue WHERE product LIKE ? AND supplier LIKE ?";
+        float price = 0;
 
+        try (PreparedStatement pstatement = connection.prepareStatement(query)) {
+            pstatement.setInt(1, prodCode);
+            pstatement.setString(2, supplierCode);
+            ResultSet resultSet = pstatement.executeQuery();
 
-        try (PreparedStatement pstatement = connection.prepareStatement(query); PreparedStatement pstatement2 = connection.prepareStatement(query2)) {
-            pstatement.setInt(1, code);
-            pstatement.setString(2, name);
-            pstatement.setString(3, description);
-            pstatement.setString(4, category);
-            pstatement.setString(5, photoPath);
-            pstatement.executeUpdate();
-
-            pstatement2.setInt(1, code);
-            pstatement2.setString(2, supplier);
-            pstatement2.setFloat(3, price);
-            pstatement2.executeUpdate();
-
-
+            while (resultSet.next())
+                    price = resultSet.getFloat("price");
         }
+        return price;
     }
+
+
 
 }
