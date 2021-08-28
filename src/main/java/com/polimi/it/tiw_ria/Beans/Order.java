@@ -1,7 +1,9 @@
 package com.polimi.it.tiw_ria.Beans;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Order implements Serializable {
@@ -14,6 +16,7 @@ public class Order implements Serializable {
     private float shipmentFees;
     private float total;
     private int numOrder;
+    private Date date;
 
     public int getNumOrder() {
         return numOrder;
@@ -23,11 +26,12 @@ public class Order implements Serializable {
         this.numOrder = numOrder;
     }
 
-    public Order (String supplierCode, float shipmentFees, float total, int numOrder) {
+    public Order (String supplierCode, float shipmentFees, float total, int numOrder, Date date) {
         this.supplierCode = supplierCode;
         this.shipmentFees = shipmentFees;
         this.total = total;
         this.numOrder = numOrder;
+        this.date = date;
     }
 
     public float getTotal() {
@@ -81,5 +85,9 @@ public class Order implements Serializable {
 
     public String getSupplierName() {
         return supplierName;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

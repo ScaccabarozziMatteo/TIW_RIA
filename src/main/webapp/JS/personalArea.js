@@ -728,7 +728,7 @@ function printOrders(orders) {
     for (let y = 0; y < orders.length; y++) {
 
         let orderID = document.createElement('h3');
-        orderID.textContent = '#Ordine:' + orders[y].numOrder + ' - ' + orders[y].supplierName;
+        orderID.textContent = '#Ordine:' + orders[y].numOrder + ' - ' + orders[y].date + ' - ' + orders[y].supplierName;
         containerOrderContent.appendChild(orderID);
 
         let table = document.createElement('table');
