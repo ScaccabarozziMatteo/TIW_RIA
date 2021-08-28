@@ -6,8 +6,6 @@ let searchBar = document.getElementById("searchBar");
 let homeButton = document.getElementById("homeButton");
 let productsSearched;
 
-let orders = [];
-
 // Constructor of product
 function Product(product) {
     this.name = product.name;
@@ -74,8 +72,6 @@ buttonCart.addEventListener('click', function () {
 homeButton.addEventListener('click', function () {
     homeAction();
 })
-
-getOrders();
 
 let cartColl = document.getElementById("cartCollapsible")
 
@@ -621,14 +617,9 @@ function orderCollapse(collapse, anchor) {
         if (document.getElementById("ordersMessage") !== null)
             document.getElementById("ordersMessage").remove();
     } else {
-        printOrders();
+        getOrders();
         content.style.maxHeight = content.scrollHeight + "px";
     }
-
-    setTimeout(() => {
-        if (anchor)
-            window.location.href = "#ordersCollapsible";
-    }, 200);
 
 }
 
@@ -689,9 +680,8 @@ function sentOrder(order) {
             let message = request.responseText;
             switch (request.status) {
                 case 200:
-                    getOrders();
                     cartCollapse(true);
-                    orderCollapse(-1);
+                    getOrders()
                     break;
                 default:
                     alert(message);
@@ -707,7 +697,8 @@ function getOrders() {
         if (request.readyState === XMLHttpRequest.DONE) {
             switch (request.status) {
                 case 200:
-                    orders = JSON.parse(request.responseText);
+                    let orders = JSON.parse(request.responseText);
+                    printOrders(orders);
                     break;
                 default:
                     sessionStorage.clear();
@@ -717,7 +708,7 @@ function getOrders() {
     })
 }
 
-function printOrders() {
+function printOrders(orders) {
 
     if (document.getElementById('containerOrderContent') != null)
         document.getElementById('containerOrderContent').remove();
@@ -812,7 +803,16 @@ function printOrders() {
         containerOrderContent.appendChild(document.createElement('br'));
 
     }
+    let orderColl = document.getElementById("ordersCollapsible");
+    let content = orderColl.nextElementSibling;
     contentOrders.appendChild(containerOrderContent);
+    setTimeout(() => {
+        content.style.maxHeight = content.scrollHeight + "px";
+    }, 100);
+    setTimeout(() => {
+        content.style.maxHeight = content.scrollHeight + "px";
+        window.location.href = "#ordersCollapsible";
+        }, 200);
 }
 
 function getNumProductInCart(product, supplier) {
