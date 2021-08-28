@@ -8,6 +8,18 @@ let productsSearched;
 
 let orders = [];
 
+// Constructor of product
+function Product(product) {
+    this.name = product.name;
+    this.category = product.category;
+    this.code = product.code;
+    this.description = product.description;
+    this.image = product.image;
+    this.price = product.price;
+    this.quantity = product.quantity;
+    this.sale = product.sale;
+}
+
 window.addEventListener('load', function () {
     if (name == null) {
         sessionStorage.clear();
@@ -17,13 +29,16 @@ window.addEventListener('load', function () {
 
 let fiveProducts = JSON.parse(sessionStorage.getItem('fiveProducts'));
 let viewedElements = JSON.parse(sessionStorage.getItem('viewedElements'));
-let cart = JSON.parse(sessionStorage.getItem('cart'));
+cart = sessionStorage.getItem('cart');
+
+if (cart !== "" && cart != null) {
+    cart = JSON.parse(cart);
+} else
+    cart = []
 
 // Initialize cart and viewedElements if they don't exist
 if (viewedElements == null)
     viewedElements = [];
-if (cart == null)
-    cart = [];
 
 if (document.getElementById("welcome") == null) {
     sessionStorage.clear();
@@ -377,11 +392,11 @@ function printProductDetails(suppliers, product, shipmentPolicies) {
                 ev.preventDefault();
             else {
                 ev.preventDefault();
-                addProductsCart(supplier, product, addProductsInputNumArt.value, shipmentPolicies);
+                addProductsCart(supplier, product, addProductsInputNumArt.value, shipmentPolicies, suppliers[x].priceProd);
                 detailsPopupContainer.style.display = 'none';
                 searchBar.value = '';
                 printProductSearched(productsSearched, searchBar);
-                cartCollapse(true, shipmentPolicies, true);
+                cartCollapse(true, true);
             }
         });
 
@@ -398,55 +413,52 @@ function printProductDetails(suppliers, product, shipmentPolicies) {
 
 }
 
-function addProductsCart(supplier, prod, quantity, shipmentPolicies) {
+function addProductsCart(supp, prod, quantity, shipmentPolicies, price) {
     let cartLength = cart.length;
-    let product = null;
     let added = false;
-    let subtotal = 0;
-    let costShipment = 0;
-    let products = {
-        product,
-    };
-    let order = {
-        products: [],
-        supplier,
-        costShipment,
-        subtotal
-    };
 
+    prod.price = price;
 
     for (let i = 0; i < cartLength; i++) {
-        if (cart[i].supplier.code === supplier.code) {
+        if (cart[i].supplier.code === supp.code) {
             let numProd = cart[i].products.length;
             for (let x = 0; x < numProd; x++) {
-                if (cart[i].products[x].product.code === prod.code) {
+                if (cart[i].products[x].product.code === prod.code && !added) {   // Elemento già c'è, aggiorna il valore quantità
                     cart[i].products[x].product.quantity = Number.parseInt(cart[i].products[x].product.quantity) + Number.parseInt(quantity);
                     cart[i].quantity += Number(quantity);
-                    cart[i].costShipment = getShipmentCost(supplier.code, getTotalCostOrder(cart[i]), quantity, shipmentPolicies);
+                    cart[i].costShipment = getShipmentCost(supp.code, getTotalCostOrder(cart[i]), cart[i].quantity, shipmentPolicies);
                     added = true;
+                    sessionStorage.setItem('cart', JSON.stringify(cart));
+                    return;
                 }
             }
             if (added)  // Se l'elemento è stato aggiunto termina la funzione di inserimento
                 return false;
             else {      // Se elemento non esiste ma c'è il fornitore
-                products.product = prod;
-                products.product.quantity = quantity;
-                cart[i].products.push(products);
+                let order1 = cart[i];
+                order1.products.push(prod);
+                cart[i].products[order1.products.length - 1].product = new Product(prod);
+                cart[i].products[order1.products.length - 1].product.quantity = quantity;
                 cart[i].quantity += Number(quantity);
-                cart[i].costShipment = getShipmentCost(supplier.code, getTotalCostOrder(cart[i]), quantity, shipmentPolicies);
+                cart[i].costShipment = getShipmentCost(supp.code, getTotalCostOrder(cart[i]), cart[i].quantity, shipmentPolicies);
+                sessionStorage.setItem('cart', JSON.stringify(cart));
                 return;
             }
         }
     }
-    order.supplier = supplier;
-    products.product = prod;
-    products.product.quantity = quantity;
-    order.products.push(products);
-    order.quantity = Number(quantity);
-    order.costShipment = getShipmentCost(supplier.code, getTotalCostOrder(order), quantity, shipmentPolicies);
-    cart.push(order);
 
-    sessionStorage.setItem('cart', JSON.stringify(cart));
+    if (!added) {
+        let order = {products:[]};
+        let product = {product: ''};
+        order.supplier = supp;
+        product.product = new Product(prod);
+        order.products.push(product);
+        order.products[0].product.quantity = quantity;
+        order.quantity = Number(quantity);
+        order.costShipment = getShipmentCost(supp.code, getTotalCostOrder(order), quantity, shipmentPolicies);
+        cart.push(order);
+        sessionStorage.setItem('cart', JSON.stringify(cart));
+    }
 }
 
 function printCart(contentCart) {
@@ -519,9 +531,13 @@ function printCart(contentCart) {
             deleteSpan.id = 'bin';
             deleteTd.appendChild(deleteSpan);
             deleteSpan.addEventListener('click', function () {
+                let quantity = cart[y].products[a].quantity;
                 cart[y].products.splice(a, 1);
                 if (cart[y].products.length === 0)
                     cart.splice(y, 1);
+                else
+                    cart[y].quantity -= quantity;
+                sessionStorage.setItem('cart', cart);
                 printCart(contentCart);
             });
             row2.appendChild(deleteTd);
@@ -531,13 +547,9 @@ function printCart(contentCart) {
         let totalCol = document.createElement('td');
         totalCol.textContent = 'Totale';
         let totalShipCostCol = document.createElement('td');
-        let totalShipCost = 0;
-
-        totalShipCost = cart[y].costShipment;       // Set shipment cost of this order in cart
-        totalShipCostCol.textContent = totalShipCost.toString() + ".00 \u20ac";
         let totalCostCol = document.createElement('td');
-        let totalVar = totalShipCost + totalCost;
-        totalCostCol.textContent = totalVar.toString() +    ".00 \u20ac";
+        // Set shipment cost of this order in cart
+        getShipmentCost(supplierCode, totalCost, totalQuantity, null, totalShipCostCol, totalCostCol) + ".00 \u20ac";
         let orderButtonCol = document.createElement('td');
         let orderButton = document.createElement('button');
         orderButton.textContent = 'Ordina tutti i prodotti di questo fornitore!';
@@ -620,15 +632,41 @@ function orderCollapse(collapse, anchor) {
 
 }
 
-function getShipmentCost(supplierCode, totalCost, totalQuantity, shipmentPolicies) {
+function getShipmentCost(supplierCode, totalCost, totalQuantity, shipmentPolicies, element, element2) {
     let cost = 0;
 
-    for (let i = 0; i < shipmentPolicies.length; i++) {
-        if (shipmentPolicies[i].supplier === supplierCode) {
-            if (parseFloat(totalCost) >= parseFloat(shipmentPolicies[i].freeShipment) && shipmentPolicies[i].min_articles === 999999999)
-                return 0;
-            else if (parseInt(shipmentPolicies[i].min_articles) <= totalQuantity && totalQuantity <= parseInt(shipmentPolicies[i].max_articles))
-                cost = parseFloat(shipmentPolicies[i].costShipment);
+    if (shipmentPolicies == null) {
+        makeCall('GET', 'getShipmentPolicies?supplierCode=' + supplierCode, null, function (request) {
+                if (request.readyState === XMLHttpRequest.DONE) {
+                    switch (request.status) {
+                        case 200:
+                            shipmentPolicies = JSON.parse(request.responseText);
+                            for (let i = 0; i < shipmentPolicies.length; i++) {
+                                if (shipmentPolicies[i].supplier === supplierCode) {
+                                    if (parseFloat(totalCost) >= parseFloat(shipmentPolicies[i].freeShipment) && shipmentPolicies[i].min_articles === 999999999) {
+                                        element.textContent = "0.00 \u20ac";
+                                        element2.textContent = totalCost + ".00 \u20ac";
+                                        return;
+                                    }
+                                    else if (parseInt(shipmentPolicies[i].min_articles) <= totalQuantity && totalQuantity <= parseInt(shipmentPolicies[i].max_articles)) {
+                                        element.textContent = parseFloat(shipmentPolicies[i].costShipment) + ".00 \u20ac";
+                                        element2.textContent = Number(totalCost + shipmentPolicies[i].costShipment)+ ".00 \u20ac";
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+        })
+    }
+    else {
+        for (let i = 0; i < shipmentPolicies.length; i++) {
+            if (shipmentPolicies[i].supplier === supplierCode) {
+                if (parseFloat(totalCost) >= parseFloat(shipmentPolicies[i].freeShipment) && shipmentPolicies[i].min_articles === 999999999)
+                    return 0;
+                else if (parseInt(shipmentPolicies[i].min_articles) <= totalQuantity && totalQuantity <= parseInt(shipmentPolicies[i].max_articles))
+                    return parseFloat(shipmentPolicies[i].costShipment);
+            }
         }
     }
     return cost;
@@ -775,21 +813,6 @@ function printOrders() {
 
     }
     contentOrders.appendChild(containerOrderContent);
-}
-
-function getShipmentPolicies(prodCode) {
-    makeCall('GET', 'getShipmentPolicies?prodCode=' + prodCode, null, function (request) {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            switch (request.status) {
-                case 200:
-                    shipmentPolicies = JSON.parse(request.responseText);
-                    break;
-                default:
-                    sessionStorage.clear();
-                    window.location.replace("errorPage.html");
-            }
-        }
-    })
 }
 
 function getNumProductInCart(product, supplier) {

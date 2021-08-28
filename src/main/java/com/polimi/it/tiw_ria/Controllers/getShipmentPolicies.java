@@ -48,13 +48,13 @@ public class getShipmentPolicies extends HttpServlet {
 
         if (strLogin != null) {
 
-            String prodCode = request.getParameter("prodCode");
+            String supplierCode = request.getParameter("supplierCode");
 
-            if (!prodCode.isEmpty()) {
+            if (!supplierCode.isEmpty()) {
 
                 ShipmentPolicyDAO shipmentPolicyDAO = new ShipmentPolicyDAO(connection);
                 try {
-                    List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyList(prodCode);
+                    List<ShipmentPolicy> shipmentPolicies = shipmentPolicyDAO.shipmentPolicyList(supplierCode);
 
                     String shipmentPoliciesString = new Gson().toJson(shipmentPolicies);
 

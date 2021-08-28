@@ -106,7 +106,7 @@ public class Orders extends HttpServlet {
 
             Order order;
             List<Product> products = new ArrayList<>();
-            int quantity = 0;
+            int quantity;
             int codeProd;
             float costProd;
             float totalCost = 0;
@@ -117,7 +117,6 @@ public class Orders extends HttpServlet {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
 
             JSONString = br.readLine();
-            System.out.println(JSONString);
 
             JSONObject JSONObj = new JSONObject(JSONString);
             JSONArray JSONArr;
@@ -150,7 +149,7 @@ public class Orders extends HttpServlet {
                     }
 
 
-                    order.setShipmentFees(shipmentPolicyDAO.getShipmentFeeCost(supplierCode, quantity, totalCost));
+                    order.setShipmentFees(shipmentPolicyDAO.getShipmentFeeCost(supplierCode, totalQuantity, totalCost));
                     order.setTotal(totalCost);
                     order.setProducts(products);
 
