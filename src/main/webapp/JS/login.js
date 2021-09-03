@@ -1,4 +1,4 @@
-(function() {
+(function loginForm() {
 
     document.getElementById("loginButton").addEventListener('click', (e) => {
         let form = e.target.closest("form");

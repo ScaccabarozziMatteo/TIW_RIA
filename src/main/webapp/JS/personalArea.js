@@ -18,6 +18,90 @@ function Product(product) {
     this.sale = product.sale;
 }
 
+function pageOrchestrator() {
+
+    switch (sex) {
+        case 'male':
+            welcomeDiv.textContent = "Benvenuto " + name;
+            break;
+        case 'female':
+            welcomeDiv.textContent = "Benvenuta " + name;
+            break;
+        case null:
+            welcomeDiv.textContent = "Benvenut* " + name;
+            break;
+    }
+
+    logout_button.addEventListener("click", function () {
+        makeCall('GET', 'logout', null, function (request) {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                switch (request.status) {
+                    case 200:
+                        sessionStorage.clear();
+                        window.location.replace("index.html");
+                        break;
+                    default:
+                        sessionStorage.clear();
+                        window.location.replace("index.html");
+                }
+            }
+        });
+    })
+
+    let buttonCart = document.getElementById('cartButton');
+    buttonCart.addEventListener('click', function () {
+        cartCollapse(true, true);
+    })
+
+    homeButton.addEventListener('click', function () {
+        homeAction();
+    })
+
+    let cartColl = document.getElementById("cartCollapsible")
+
+    cartColl.addEventListener("click", function () {
+        cartCollapse(false);
+    });
+
+    let ordersButtonNav = document.getElementById('orderButtonNav');
+    ordersButtonNav.addEventListener('click', function () {
+        orderCollapse(true, true);
+    })
+
+    let ordersColl = document.getElementById("ordersCollapsible");
+
+    ordersColl.addEventListener("click", function () {
+        orderCollapse();
+    });
+
+    searchBar.addEventListener("keypress", e => {
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
+                function (request) {
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        switch (request.status) {
+                            case 200:
+                                productsSearched = JSON.parse(request.responseText);
+                                printProductSearched(productsSearched, searchBar);
+
+                                window.location.href = "#searchedProducts";
+                                document.getElementById('searchBar').focus({preventScroll: true});
+
+                                break;
+                            default:
+                                sessionStorage.clear();
+                                window.location.replace("errorPage.html");
+                        }
+                    }
+                })
+        }
+
+    });
+
+}
+
 window.addEventListener('load', function () {
     if (name == null) {
         sessionStorage.clear();
@@ -44,78 +128,9 @@ if (document.getElementById("welcome") == null) {
 } else
     welcomeDiv = document.getElementById("welcome");
 
-
-switch (sex) {
-    case 'male':
-        welcomeDiv.textContent = "Benvenuto " + name;
-        break;
-    case 'female':
-        welcomeDiv.textContent = "Benvenuta " + name;
-        break;
-    case null:
-        welcomeDiv.textContent = "Benvenut* " + name;
-        break;
-}
+pageOrchestrator();
 
 get5products();
-
-logout_button.addEventListener("click", function () {
-    sessionStorage.clear();
-    window.location.replace("index.html");
-})
-
-let buttonCart = document.getElementById('cartButton');
-buttonCart.addEventListener('click', function () {
-    cartCollapse(true, true);
-})
-
-homeButton.addEventListener('click', function () {
-    homeAction();
-})
-
-let cartColl = document.getElementById("cartCollapsible")
-
-cartColl.addEventListener("click", function () {
-    cartCollapse(false);
-});
-
-let ordersButtonNav = document.getElementById('orderButtonNav');
-ordersButtonNav.addEventListener('click', function () {
-    orderCollapse(true, true);
-})
-
-let ordersColl = document.getElementById("ordersCollapsible");
-
-ordersColl.addEventListener("click", function () {
-    orderCollapse();
-});
-
-searchBar.addEventListener("keypress", e => {
-
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        makeCall("GET", "SearchProduct?search=" + searchBar.value, null,
-            function (request) {
-                if (request.readyState === XMLHttpRequest.DONE) {
-                    switch (request.status) {
-                        case 200:
-                            productsSearched = JSON.parse(request.responseText);
-                            printProductSearched(productsSearched, searchBar);
-
-                            window.location.href = "#searchedProducts";
-                            document.getElementById('searchBar').focus({preventScroll: true});
-
-                            break;
-                        default:
-                            sessionStorage.clear();
-                            window.location.replace("errorPage.html");
-                    }
-                }
-            })
-    }
-
-});
-
 
 function printProductSearched(listProducts, searchBar) {
     const searchedProd = document.getElementById("searchedProducts");
@@ -601,7 +616,7 @@ function cartCollapse(collapse, anchor) {
 
 }
 
-function orderCollapse(collapse, anchor) {
+function orderCollapse(collapse) {
     let orderColl = document.getElementById("ordersCollapsible");
 
     orderColl.classList.toggle("active");
@@ -830,7 +845,7 @@ function homeAction() {
     cartCollapse(-1);
     orderCollapse(-1);
     searchBar.value = '';
-
+    window.scrollTo(0, 0);
 }
 
 function get5products() {

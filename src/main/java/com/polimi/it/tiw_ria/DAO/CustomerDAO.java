@@ -34,19 +34,6 @@ public class CustomerDAO {
         return customers;
     }
 
-    public void createCustomer(String email, String name, String surname, String address, String password, String sex) throws SQLException {
-        String query = "INSERT into dbtest.customers (email, name, surname, address, password, sex) VALUES(?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstatement = connection.prepareStatement(query);) {
-            pstatement.setString(1, email);
-            pstatement.setString(2, name);
-            pstatement.setString(3, surname);
-            pstatement.setString(4, address);
-            pstatement.setString(5, password);
-            pstatement.setString(6, sex);
-            pstatement.executeUpdate();
-        }
-    }
-
     public Customer getCustomer(String email, String password) throws SQLException {
         String Query = "SELECT * FROM dbtest.customers WHERE customers.email LIKE ? AND customers.password LIKE ?";
         Customer customer = null;
@@ -64,19 +51,4 @@ public class CustomerDAO {
         return customer;
     }
 
-    public boolean findIfExistCustomer(String email) throws SQLException {
-        String Query = "SELECT email FROM dbtest.customers WHERE customers.email LIKE ?";
-        boolean returnValue = false;
-
-        try (PreparedStatement statement = connection.prepareStatement(Query);) {
-
-            statement.setString(1, email);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next())
-                if (email.equals(resultSet.getString("email")))
-                    returnValue = true;
-        }
-        return returnValue;
-    }
 }
