@@ -5,7 +5,7 @@ The aim of the project is creating a web app application. Back-end is developed 
 
 You can import on your database (i used MySQL) my DB Dump --> [DB Dump](https://github.com/ScaccabarozziMatteo/TIW_RIA/blob/master/db_dump.sql)
 
-Web app has been deployed on TomCat Server and i use IntelliJ IDEA as IDE.
+Web app has been deployed on TomCat Server and i used IntelliJ IDEA as IDE.
 
 ## Interface
 ### Access panel form
